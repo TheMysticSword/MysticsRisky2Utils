@@ -10,7 +10,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
     {
         public BuffDef buffDef;
         public static List<BaseBuff> loadedBuffs = new List<BaseBuff>();
-        public AssetPathModification iconPath;
+        public abstract AssetPathModification iconPath { get; }
 
         public override void Load()
         {

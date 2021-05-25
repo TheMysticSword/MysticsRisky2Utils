@@ -16,7 +16,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public System.Type trackerType;
         public System.Type serverTrackerType;
         public AchievementDef achievementDef;
-        public AssetPathModification iconPath;
+        public abstract AssetPathModification iconPath { get; }
 
         public override void Load()
         {

@@ -15,7 +15,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public Texture recolorRamp;
         public int tier = 0;
 
-        public AssetPathModification recolorRampPath;
+        public abstract AssetPathModification recolorRampPath { get; }
 
         public static List<BaseElite> elites = new List<BaseElite>();
 
