@@ -61,22 +61,19 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             c.Emit(OpCodes.Ldarg, 0);
             c.EmitDelegate<System.Action<CharacterModel>>((characterModel) =>
             {
-                if (characterModel.body)
+                MysticsRisky2UtilsCustomEliteFields component = characterModel.gameObject.GetComponent<MysticsRisky2UtilsCustomEliteFields>();
+                if (component)
                 {
-                    MysticsRisky2UtilsCustomEliteFields component = characterModel.GetComponent<MysticsRisky2UtilsCustomEliteFields>();
-                    if (component)
+                    BaseElite customElite = elites.FirstOrDefault(x => x.eliteDef.eliteIndex == characterModel.myEliteIndex);
+                    if (customElite != null)
                     {
-                        BaseElite customElite = elites.FirstOrDefault(x => x.eliteDef.eliteIndex == characterModel.myEliteIndex);
-                        if (customElite != null)
-                        {
-                            if (!component.eliteRampReplaced) component.eliteRampReplaced = true;
-                            characterModel.propertyStorage.SetTexture(EliteRampPropertyID, customElite.recolorRamp);
-                        }
-                        else if (component.eliteRampReplaced)
-                        {
-                            component.eliteRampReplaced = false;
-                            characterModel.propertyStorage.SetTexture(EliteRampPropertyID, Shader.GetGlobalTexture(EliteRampPropertyID));
-                        }
+                        if (!component.eliteRampReplaced) component.eliteRampReplaced = true;
+                        characterModel.propertyStorage.SetTexture(EliteRampPropertyID, customElite.recolorRamp);
+                    }
+                    else if (component.eliteRampReplaced)
+                    {
+                        component.eliteRampReplaced = false;
+                        characterModel.propertyStorage.SetTexture(EliteRampPropertyID, Shader.GetGlobalTexture(EliteRampPropertyID));
                     }
                 }
             });
