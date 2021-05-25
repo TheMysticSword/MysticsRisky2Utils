@@ -20,45 +20,45 @@ namespace MysticsRisky2Utils.ContentManagement
             coroutine = new ParallelProgressCoroutine(progress);
         }
 
-        public void DispatchLoad<OutType>(System.Type loadType, System.Action<OutType[]> onComplete = null)
+        public void DispatchLoad<OutType>(Assembly assembly, System.Type loadType, System.Action<OutType[]> onComplete = null)
         {
             if (!typeof(BaseLoadableAsset).IsAssignableFrom(loadType))
             {
                 MysticsRisky2UtilsPlugin.logger.LogError($"Attempted to load {loadType.Name} that does not inherit from {typeof(BaseLoadableAsset).Name}");
                 return;
             }
-            AsyncLoadingEnumerator<OutType> enumerator = new AsyncLoadingEnumerator<OutType>(loadType);
+            AsyncLoadingEnumerator<OutType> enumerator = new AsyncLoadingEnumerator<OutType>(assembly, loadType);
             enumerator.onComplete = onComplete;
             coroutine.Add(enumerator, enumerator.progressReceiver);
         }
 
-        public static void PluginAwakeLoad(System.Type loadType)
+        public static void PluginAwakeLoad(Assembly assembly, System.Type loadType)
         {
             if (!typeof(BaseLoadableAsset).IsAssignableFrom(loadType))
             {
                 MysticsRisky2UtilsPlugin.logger.LogError($"Attempted to load {loadType.Name} that does not inherit from {typeof(BaseLoadableAsset).Name} during plugin awake");
                 return;
             }
-            foreach (System.Type type in AssemblyTypes.Where(x => !x.IsAbstract && loadType.IsAssignableFrom(x)).ToList())
+            foreach (System.Type type in GetAssemblyTypes(assembly).Where(x => !x.IsAbstract && loadType.IsAssignableFrom(x)).ToList())
             {
                 BaseLoadableAsset loadableAsset = BaseLoadableAsset.Get(type);
                 loadableAsset.OnPluginAwake();
             }
         }
 
-        public static System.Type[] assemblyTypes;
-        public static System.Type[] AssemblyTypes
+        public static Dictionary<string, System.Type[]> assemblyNameToTypes = new Dictionary<string, System.Type[]>();
+        public static System.Type[] GetAssemblyTypes(Assembly assembly)
         {
-            get
-            {
-                if (assemblyTypes == null) assemblyTypes = Assembly.GetExecutingAssembly().GetTypes();
-                return assemblyTypes;
-            }
+            string assemblyName = assembly.FullName;
+            if (assemblyNameToTypes.ContainsKey(assemblyName)) return assemblyNameToTypes[assemblyName];
+            System.Type[] types = assembly.GetTypes();
+            assemblyNameToTypes.Add(assemblyName, types);
+            return types;
         }
 
-        public static void PluginAwakeLoad<T>()
+        public static void PluginAwakeLoad<T>(Assembly assembly)
         {
-            PluginAwakeLoad(typeof(T));
+            PluginAwakeLoad(assembly, typeof(T));
         }
 
         public class AsyncLoadingEnumerator<OutType> : IEnumerator<object>, IEnumerator, System.IDisposable
@@ -90,9 +90,9 @@ namespace MysticsRisky2Utils.ContentManagement
             public System.Action<OutType[]> onComplete;
             public ReadableProgress<float> progressReceiver = new ReadableProgress<float>();
 
-            public AsyncLoadingEnumerator(System.Type type)
+            public AsyncLoadingEnumerator(Assembly assembly, System.Type type)
             {
-                types = AssemblyTypes.Where(x => !x.IsAbstract && type.IsAssignableFrom(x)).ToList();
+                types = GetAssemblyTypes(assembly).Where(x => !x.IsAbstract && type.IsAssignableFrom(x)).ToList();
             }
 
             public bool done
