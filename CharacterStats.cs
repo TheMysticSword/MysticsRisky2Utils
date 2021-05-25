@@ -13,6 +13,7 @@ namespace MysticsRisky2Utils
     public static class CharacterStats
     {
         public delegate float StatModifierApplyTimes(GenericCharacterInfo genericCharacterInfo);
+        public delegate bool StatModifierShouldApply(GenericCharacterInfo genericCharacterInfo);
 
         public struct StatModifier
         {
@@ -27,11 +28,17 @@ namespace MysticsRisky2Utils
             public StatModifierApplyTimes times;
         }
 
+        public struct BoolStatModifier
+        {
+            public StatModifierShouldApply shouldApply;
+        }
+
         public static List<FlatStatModifier> levelModifiers = new List<FlatStatModifier>();
         public static List<StatModifier> healthModifiers = new List<StatModifier>();
         public static List<StatModifier> shieldModifiers = new List<StatModifier>();
         public static List<FlatStatModifier> regenModifiers = new List<FlatStatModifier>();
         public static List<StatModifier> moveSpeedModifiers = new List<StatModifier>();
+        public static List<BoolStatModifier> rootMovementModifiers = new List<BoolStatModifier>();
         public static List<StatModifier> damageModifiers = new List<StatModifier>();
         public static List<StatModifier> attackSpeedModifiers = new List<StatModifier>();
         public static List<FlatStatModifier> critModifiers = new List<FlatStatModifier>();
@@ -259,6 +266,37 @@ namespace MysticsRisky2Utils
                     c.Emit(OpCodes.Stloc, moveSpeedDivisorPosition);
                 }
                 else ErrorHookFailed("movement speed");
+
+                // root movement
+                if (c.TryGotoNext(
+                    MoveType.After,
+                    x => x.MatchLdarg(0),
+                    x => x.MatchLdcR4(1),
+                    x => x.MatchCallOrCallvirt<CharacterBody>("set_moveSpeed"),
+                    x => x.MatchLdarg(0),
+                    x => x.MatchLdcR4(80),
+                    x => x.MatchCallOrCallvirt<CharacterBody>("set_acceleration")
+                ) && c.TryGotoPrev(
+                    MoveType.After,
+                    x => x.MatchOr()
+                ))
+                {
+                    c.EmitDelegate<System.Func<bool>>(() =>
+                    {
+                        bool flag = false;
+                        foreach (BoolStatModifier statModifier in rootMovementModifiers)
+                        {
+                            if (statModifier.shouldApply(genericCharacterInfo))
+                            {
+                                flag = true;
+                                break;
+                            }
+                        }
+                        return flag;
+                    });
+                    c.Emit(OpCodes.Or);
+                }
+                else ErrorHookFailed("root movement");
 
                 // damage
                 int damageFlatPosition = 66;

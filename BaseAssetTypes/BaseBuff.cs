@@ -29,6 +29,10 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         {
             return genericCharacterInfo.body.HasBuff(buffDef) ? 1f : 0f;
         }
+        private bool StatModifierShouldApply(GenericCharacterInfo genericCharacterInfo)
+        {
+            return genericCharacterInfo.body.HasBuff(buffDef);
+        }
         public void AddModifier(List<CharacterStats.StatModifier> list, float multiplier, float flat, bool stacks)
         {
             CharacterStats.StatModifier statModifier = new CharacterStats.StatModifier
@@ -50,6 +54,14 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             if (!stacks) statModifier.times = StatModifierTimesNoStack;
             list.Add(statModifier);
         }
+        public void AddModifier(List<CharacterStats.BoolStatModifier> list)
+        {
+            CharacterStats.BoolStatModifier statModifier = new CharacterStats.BoolStatModifier
+            {
+                shouldApply = StatModifierShouldApply
+            };
+            list.Add(statModifier);
+        }
         public void AddLevelModifier(int amount, bool stacks = true)
         {
             AddModifier(CharacterStats.levelModifiers, amount, stacks);
@@ -69,6 +81,10 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public void AddMoveSpeedModifier(float multiplier = 0f, float flat = 0f, bool stacks = true)
         {
             AddModifier(CharacterStats.moveSpeedModifiers, multiplier, flat, stacks);
+        }
+        public void AddRootMovementModifier()
+        {
+            AddModifier(CharacterStats.rootMovementModifiers);
         }
         public void AddDamageModifier(float multiplier = 0f, float flat = 0f, bool stacks = true)
         {
