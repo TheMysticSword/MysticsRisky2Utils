@@ -6,6 +6,8 @@ using System.Linq;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using MysticsRisky2Utils.ContentManagement;
+using MonoMod.RuntimeDetour;
+using System.Reflection;
 
 namespace MysticsRisky2Utils.BaseAssetTypes
 {
@@ -36,6 +38,55 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             IL.RoR2.CharacterModel.UpdateMaterials += CharacterModel_UpdateMaterials;
 
             On.RoR2.CombatDirector.Init += CombatDirector_Init;
+            MethodInfo scriptedCombatEncounterSpawnHandler = typeof(ScriptedCombatEncounter).GetMethod("<Spawn>g__HandleSpawn|18_0", MysticsRisky2UtilsPlugin.bindingFlagAll);
+            if (scriptedCombatEncounterSpawnHandler != null)
+            {
+                ILHook h = new ILHook(
+                    scriptedCombatEncounterSpawnHandler,
+                    il =>
+                    {
+                        ILCursor c = new ILCursor(il);
+
+                        int arrayLocalVarPos = 0;
+                        if (c.TryGotoNext(
+                            MoveType.After,
+                            x => x.MatchNewarr<EliteDef>()
+                        ) && c.TryGotoNext(
+                            MoveType.After,
+                            x => x.MatchLdsfld(typeof(RoR2Content.Elites), "Fire")
+                        ) && c.TryGotoNext(
+                            MoveType.After,
+                            x => x.MatchLdsfld(typeof(RoR2Content.Elites), "Lightning")
+                        ) && c.TryGotoNext(
+                            MoveType.After,
+                            x => x.MatchLdsfld(typeof(RoR2Content.Elites), "Ice")
+                        ) && c.TryGotoNext(
+                            MoveType.After,
+                            x => x.MatchStloc(out arrayLocalVarPos)
+                        ))
+                        {
+                            c.Emit(OpCodes.Ldloc, arrayLocalVarPos);
+                            c.EmitDelegate<System.Func<EliteDef[], EliteDef[]>>((array) =>
+                            {
+                                foreach (BaseElite customElite in elites.FindAll(x => x.tier == 1))
+                                {
+                                    HG.ArrayUtils.ArrayAppend(ref array, customElite.eliteDef);
+                                }
+                                return array;
+                            });
+                            c.Emit(OpCodes.Stloc, arrayLocalVarPos);
+                        }
+                        else
+                        {
+                            MysticsRisky2UtilsPlugin.logger.LogWarning("Failed to add custom elites to ScriptedCombatEncounter's Artifact of Honor elite list. Alloy Worship Unit, Aurelionite and other scripted combat encounter enemies cannot become custom elites.");
+                        }
+                    }
+                );
+            } else
+            {
+                MysticsRisky2UtilsPlugin.logger.LogWarning("Failed to add custom elites to ScriptedCombatEncounter's Artifact of Honor elite list. Alloy Worship Unit, Aurelionite and other scripted combat encounter enemies cannot become custom elites.");
+                MysticsRisky2UtilsPlugin.logger.LogWarning("(for TheMysticSword: ScriptedCombatEncounter HandleSpawn method no longer exists)");
+            }
         }
 
         public static void CharacterModel_Awake(On.RoR2.CharacterModel.orig_Awake orig, CharacterModel self)
