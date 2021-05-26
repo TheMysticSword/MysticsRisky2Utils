@@ -41,6 +41,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             else
             {
                 equipmentDef.canDrop = false;
+                equipmentDef.enigmaCompatible = false;
             }
             asset = equipmentDef;
         }
