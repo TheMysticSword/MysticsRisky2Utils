@@ -34,6 +34,7 @@ namespace MysticsRisky2Utils
             BaseAssetTypes.BaseInteractable.Init();
             ChildLocatorAdditions.Init();
             CharacterStats.Init();
+            GenericChildLocatorAdditions.Init();
             GenericGameEvents.Init();
             StateSerializerFix.Init();
 
