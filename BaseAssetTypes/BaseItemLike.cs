@@ -67,8 +67,42 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 
         public void CopyModelToFollower()
         {
-            if (followerModel) Object.Destroy(followerModel);
+            string uniqueMaterialString = " (MysticsRisky2Utils Follower Mat)";
+
+            if (followerModel)
+            {
+                foreach (Renderer renderer in followerModel.GetComponentsInChildren<MeshRenderer>())
+                {
+                    Material material = renderer.material;
+                    if (material && material.name.Contains(uniqueMaterialString))
+                    {
+                        Object.Destroy(material);
+                    }
+                }
+                Object.Destroy(followerModel);
+            }
             followerModel = PrefabAPI.InstantiateClone(model, model.name + "Follower", false);
+
+            void DuplicateRendererMaterial(Renderer renderer)
+            {
+                string newMaterialName = renderer.material.name + uniqueMaterialString;
+                renderer.material = Object.Instantiate(renderer.material);
+                renderer.material.name = newMaterialName;
+            }
+
+            Renderer firstRenderer = followerModel.GetComponentInChildren<MeshRenderer>();
+            if (firstRenderer)
+            {
+                Material firstRendererMaterial = firstRenderer.sharedMaterial;
+                foreach (Renderer renderer in followerModel.GetComponentsInChildren<MeshRenderer>())
+                {
+                    if (renderer != firstRenderer && renderer.material == firstRendererMaterial)
+                    {
+                        DuplicateRendererMaterial(renderer);
+                    }
+                }
+                DuplicateRendererMaterial(firstRenderer);
+            }
 
             PrepareItemDisplayModel(followerModel);
         }
@@ -102,12 +136,12 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 
         public Material GetModelMaterial()
         {
-            return model.GetComponentInChildren<MeshRenderer>().material;
+            return model.GetComponentInChildren<MeshRenderer>().sharedMaterial;
         }
 
         public Material GetFollowerModelMaterial()
         {
-            return followerModel.GetComponentInChildren<MeshRenderer>().material;
+            return followerModel.GetComponentInChildren<MeshRenderer>().sharedMaterial;
         }
 
         public struct MysticsRisky2UtilsItemDisplayRules
