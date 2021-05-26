@@ -271,10 +271,10 @@ namespace MysticsRisky2Utils
                 if (c.TryGotoNext(
                     MoveType.After,
                     x => x.MatchLdarg(0),
-                    x => x.MatchLdcR4(1),
+                    x => x.MatchLdcR4(out _),
                     x => x.MatchCallOrCallvirt<CharacterBody>("set_moveSpeed"),
                     x => x.MatchLdarg(0),
-                    x => x.MatchLdcR4(80),
+                    x => x.MatchLdcR4(out _),
                     x => x.MatchCallOrCallvirt<CharacterBody>("set_acceleration")
                 ) && c.TryGotoPrev(
                     MoveType.After,
