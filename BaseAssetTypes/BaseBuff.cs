@@ -10,13 +10,14 @@ namespace MysticsRisky2Utils.BaseAssetTypes
     {
         public BuffDef buffDef;
         public static List<BaseBuff> loadedBuffs = new List<BaseBuff>();
-        public abstract AssetPathModification iconPath { get; }
+
+        public abstract Sprite LoadSprite(string assetPath);
 
         public override void Load()
         {
             buffDef = ScriptableObject.CreateInstance<BuffDef>();
             OnLoad();
-            buffDef.iconSprite = AssetBundle.LoadAsset<Sprite>(iconPath(buffDef.name));
+            buffDef.iconSprite = LoadSprite(buffDef.name);
             loadedBuffs.Add(this);
             asset = buffDef;
         }

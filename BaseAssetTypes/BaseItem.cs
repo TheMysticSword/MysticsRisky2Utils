@@ -32,13 +32,13 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 
         public override void SetAssets(string assetName)
         {
-            model = AssetBundle.LoadAsset<GameObject>(modelPath(assetName));
+            model = LoadModel(assetName);
             model.name = "mdl" + itemDef.name;
 
-            bool followerModelSeparate = AssetBundle.Contains(followerModelPath(assetName));
+            bool followerModelSeparate = FollowerModelExists(assetName);
             if (followerModelSeparate)
             {
-                followerModel = AssetBundle.LoadAsset<GameObject>(followerModelPath(assetName));
+                followerModel = LoadFollowerModel(assetName);
                 followerModel.name = "mdl" + itemDef.name + "Follower";
             }
 
@@ -54,7 +54,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 
         public override void SetIcon(string assetName)
         {
-            itemDef.pickupIconSprite = AssetBundle.LoadAsset<Sprite>(iconPath(assetName));
+            itemDef.pickupIconSprite = LoadIconSprite(assetName);
         }
 
         public override UnlockableDef GetUnlockableDef()

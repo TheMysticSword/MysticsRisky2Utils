@@ -16,7 +16,8 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public System.Type trackerType;
         public System.Type serverTrackerType;
         public AchievementDef achievementDef;
-        public abstract AssetPathModification iconPath { get; }
+
+        public abstract Sprite LoadSprite(string assetName);
 
         public override void Load()
         {
@@ -30,7 +31,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                 prerequisiteAchievementIdentifier = prerequisiteName,
                 nameToken = "ACHIEVEMENT_" + name.ToUpper(CultureInfo.InvariantCulture) + "_NAME",
                 descriptionToken = "ACHIEVEMENT_" + name.ToUpper(CultureInfo.InvariantCulture) + "_DESCRIPTION",
-                achievedIcon = AssetBundle.LoadAsset<Sprite>(iconPath(nameNoToken)),
+                achievedIcon = LoadSprite(nameNoToken),
                 type = trackerType,
                 serverTrackerType = serverTrackerType
             };

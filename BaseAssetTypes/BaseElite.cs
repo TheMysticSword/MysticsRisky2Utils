@@ -17,9 +17,9 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public Texture recolorRamp;
         public int tier = 0;
 
-        public abstract AssetPathModification recolorRampPath { get; }
-
         public static List<BaseElite> elites = new List<BaseElite>();
+
+        public abstract Texture LoadRecolorRamp(string assetName);
 
         public override void Load()
         {
@@ -27,7 +27,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             OnLoad();
             eliteDef.modifierToken = "ELITE_MODIFIER_" + TokenPrefix.ToUpper() + eliteDef.name.ToUpper();
             eliteDef.shaderEliteRampIndex = 0;
-            recolorRamp = AssetBundle.LoadAsset<Texture>(recolorRampPath(eliteDef.name));
+            recolorRamp = LoadRecolorRamp(eliteDef.name);
             asset = eliteDef;
             elites.Add(this);
         }

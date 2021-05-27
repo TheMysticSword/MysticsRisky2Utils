@@ -16,9 +16,10 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public ItemDisplayRuleDict itemDisplayRuleDict = new ItemDisplayRuleDict();
         public static event System.Action onSetupIDRS;
 
-        public abstract AssetPathModification modelPath { get; }
-        public abstract AssetPathModification followerModelPath { get; }
-        public abstract AssetPathModification iconPath { get; }
+        public abstract GameObject LoadModel(string assetName);
+        public abstract bool FollowerModelExists(string assetName);
+        public abstract GameObject LoadFollowerModel(string assetName);
+        public abstract Sprite LoadIconSprite(string assetName);
 
         public abstract void PreLoad(); // Always executed before loading
 

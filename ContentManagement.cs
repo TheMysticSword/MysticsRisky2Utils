@@ -162,9 +162,7 @@ namespace MysticsRisky2Utils.ContentManagement
             asset = this;
             OnLoad();
         }
-        public abstract AssetBundle AssetBundle { get; }
         public abstract string TokenPrefix { get; }
-        public delegate string AssetPathModification(string assetName);
 
         public static Dictionary<System.Type, BaseLoadableAsset> staticAssetDictionary = new Dictionary<System.Type, BaseLoadableAsset>();
 
