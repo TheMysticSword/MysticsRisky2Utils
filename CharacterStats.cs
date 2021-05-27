@@ -44,6 +44,7 @@ namespace MysticsRisky2Utils
         public static List<FlatStatModifier> critModifiers = new List<FlatStatModifier>();
         public static List<FlatStatModifier> armorModifiers = new List<FlatStatModifier>();
         public static List<StatModifier> cooldownModifiers = new List<StatModifier>();
+        public static List<FlatStatModifier> cursePenaltyModifiers = new List<FlatStatModifier>();
 
         public static void ErrorHookFailed(string name)
         {
@@ -503,6 +504,37 @@ namespace MysticsRisky2Utils
                     c.Emit(OpCodes.Stloc, cooldownFlatPosition);
                 }
                 else ErrorHookFailed("cooldown");
+
+                // curse penalty
+                int permaCurseBuffCountPos = 78;
+                if (c.TryGotoNext(
+                    MoveType.After,
+                    x => x.MatchLdarg(0),
+                    x => x.MatchLdcR4(1),
+                    x => x.MatchCallOrCallvirt<CharacterBody>("set_cursePenalty")
+                ) && c.TryGotoNext(
+                    MoveType.After,
+                    x => x.MatchCallOrCallvirt<CharacterBody>("GetBuffCount"),
+                    x => x.MatchStloc(permaCurseBuffCountPos)
+                ))
+                {
+                    c.MoveAfterLabels();
+                    c.Emit(OpCodes.Ldarg_0);
+                    c.EmitDelegate<System.Action<CharacterBody>>((characterBody) =>
+                    {
+                        float num = 0;
+                        foreach (FlatStatModifier statModifier in cursePenaltyModifiers)
+                        {
+                            float times = statModifier.times(genericCharacterInfo);
+                            if (times != 0f && statModifier.amount != 0f)
+                            {
+                                num += statModifier.amount * times;
+                            }
+                        }
+                        characterBody.cursePenalty += num;
+                    });
+                }
+                else ErrorHookFailed("curse penalty");
             };
         }
     }

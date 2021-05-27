@@ -107,5 +107,9 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         {
             AddModifier(CharacterStats.cooldownModifiers, multiplier, flat, stacks);
         }
+        public void AddCursePenaltyModifier(float amount, bool stacks = true)
+        {
+            AddModifier(CharacterStats.cursePenaltyModifiers, amount, stacks);
+        }
     }
 }
