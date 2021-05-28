@@ -32,7 +32,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             elites.Add(this);
         }
 
-        public static void Init()
+        internal static void Init()
         {
             On.RoR2.CharacterModel.Awake += CharacterModel_Awake;
             IL.RoR2.CharacterModel.UpdateMaterials += CharacterModel_UpdateMaterials;
@@ -89,14 +89,14 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             }
         }
 
-        public static void CharacterModel_Awake(On.RoR2.CharacterModel.orig_Awake orig, CharacterModel self)
+        private static void CharacterModel_Awake(On.RoR2.CharacterModel.orig_Awake orig, CharacterModel self)
         {
             orig(self);
             self.gameObject.AddComponent<MysticsRisky2UtilsCustomEliteFields>();
         }
 
         private static readonly int EliteRampPropertyID = Shader.PropertyToID("_EliteRamp");
-        public static void CharacterModel_UpdateMaterials(ILContext il)
+        private static void CharacterModel_UpdateMaterials(ILContext il)
         {
             ILCursor c = new ILCursor(il);
             c.GotoNext(
@@ -130,7 +130,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             });
         }
 
-        public static void CombatDirector_Init(On.RoR2.CombatDirector.orig_Init orig)
+        private static void CombatDirector_Init(On.RoR2.CombatDirector.orig_Init orig)
         {
             orig();
             foreach (BaseElite customElite in elites)
@@ -148,7 +148,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             }
         }
 
-        public class MysticsRisky2UtilsCustomEliteFields : MonoBehaviour
+        private class MysticsRisky2UtilsCustomEliteFields : MonoBehaviour
         {
             public bool eliteRampReplaced = false;
         }

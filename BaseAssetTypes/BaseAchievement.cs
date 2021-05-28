@@ -41,7 +41,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 
         public static List<BaseAchievement> registeredAchievements = new List<BaseAchievement>();
 
-        public static void Init()
+        internal static void Init()
         {
             IL.RoR2.AchievementManager.CollectAchievementDefs += (il) =>
             {

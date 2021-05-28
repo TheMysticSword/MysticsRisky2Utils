@@ -46,11 +46,11 @@ namespace MysticsRisky2Utils
         public static List<StatModifier> cooldownModifiers = new List<StatModifier>();
         public static List<FlatStatModifier> cursePenaltyModifiers = new List<FlatStatModifier>();
 
-        public static void ErrorHookFailed(string name)
+        internal static void ErrorHookFailed(string name)
         {
             logger.LogError(name + " stat hook failed");
         }
-        public static void Init()
+        internal static void Init()
         {
             IL.RoR2.CharacterBody.RecalculateStats += (il) =>
             {

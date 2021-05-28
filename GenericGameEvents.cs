@@ -25,11 +25,11 @@ namespace MysticsRisky2Utils
         public static event SceneRNGEventHandler OnPopulateScene;
         public static event InteractionEventHandler OnInteractionBegin;
 
-        public static void ErrorHookFailed(string name)
+        internal static void ErrorHookFailed(string name)
         {
             logger.LogError("generic game event '" + name + "' hook failed");
         }
-        public static void Init()
+        internal static void Init()
         {
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {

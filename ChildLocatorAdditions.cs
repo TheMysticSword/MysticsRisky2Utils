@@ -7,7 +7,7 @@ namespace MysticsRisky2Utils
 {
     public static class ChildLocatorAdditions
     {
-        public static void Init()
+        internal static void Init()
         {
             On.RoR2.CharacterModel.Awake += CharacterModel_Awake;
         }
@@ -21,7 +21,7 @@ namespace MysticsRisky2Utils
 
         public static List<Addition> list = new List<Addition>();
 
-        public static void CharacterModel_Awake(On.RoR2.CharacterModel.orig_Awake orig, CharacterModel self)
+        private static void CharacterModel_Awake(On.RoR2.CharacterModel.orig_Awake orig, CharacterModel self)
         {
             orig(self);
             if (self.childLocator)

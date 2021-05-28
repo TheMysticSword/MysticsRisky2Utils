@@ -179,7 +179,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public static Dictionary<string, Dictionary<string, List<DirectorCard>>> sceneCategoryCards = new Dictionary<string, Dictionary<string, List<DirectorCard>>>();
         public static List<InteractableSpawnCard> interactableSpawnCards = new List<InteractableSpawnCard>();
 
-        public static void Init()
+        internal static void Init()
         {
             SceneDirector.onGenerateInteractableCardSelection += (sceneDirector, dccs) =>
             {

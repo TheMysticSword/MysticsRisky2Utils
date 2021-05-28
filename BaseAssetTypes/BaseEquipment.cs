@@ -89,7 +89,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             equipmentThatUsesTargetFinder.Add(this);
         }
 
-        public static void Init()
+        internal static void Init()
         {
             On.RoR2.EquipmentSlot.PerformEquipmentAction += (orig, self, equipmentDef2) =>
             {
