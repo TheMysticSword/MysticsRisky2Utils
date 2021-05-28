@@ -43,7 +43,11 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             }
 
             PrepareModel(model);
-            if (followerModelSeparate) PrepareModel(followerModel);
+            if (followerModelSeparate)
+            {
+                PrepareModel(followerModel);
+                PrepareItemDisplayModel(followerModel);
+            }
 
             // Separate the follower model from the pickup model for adding different visual effects to followers
             if (!followerModelSeparate) CopyModelToFollower();
