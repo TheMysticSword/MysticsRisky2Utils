@@ -14,7 +14,7 @@ namespace MysticsRisky2Utils
 {
     [BepInDependency(R2API.R2API.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-    [R2APISubmoduleDependency(nameof(NetworkingAPI), nameof(PrefabAPI), nameof(SoundAPI))]
+    [R2APISubmoduleDependency(nameof(NetworkingAPI), nameof(LanguageAPI), nameof(PrefabAPI), nameof(SoundAPI))]
     public class MysticsRisky2UtilsPlugin : BaseUnityPlugin
     {
         public const string PluginGUID = "com.themysticsword.mysticsrisky2utils";
