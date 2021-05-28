@@ -36,6 +36,7 @@ namespace MysticsRisky2Utils
             CharacterStats.Init();
             ConCommandHelper.Init();
             CostTypeCreation.Init();
+            CustomTempVFXManagement.Init();
             GenericChildLocatorAdditions.Init();
             GenericGameEvents.Init();
             Overlays.Init();
