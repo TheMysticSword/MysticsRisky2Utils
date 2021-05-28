@@ -34,8 +34,12 @@ namespace MysticsRisky2Utils
             BaseAssetTypes.BaseInteractable.Init();
             ChildLocatorAdditions.Init();
             CharacterStats.Init();
+            ConCommandHelper.Init();
+            CostTypeCreation.Init();
             GenericChildLocatorAdditions.Init();
             GenericGameEvents.Init();
+            Overlays.Init();
+            PlainHologram.Init();
             StateSerializerFix.Init();
 
             RoR2Application.onLoad += PostGameLoad;
