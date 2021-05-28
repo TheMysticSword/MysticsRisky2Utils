@@ -36,51 +36,49 @@ namespace MysticsRisky2Utils
                 {
                     bool active = vfxInfo.condition(self);
                     MysticsRisky2UtilsTempVFX tempVFX = component.dictionary[vfxInfo.prefab];
-                    if (active != (tempVFX != null))
+                    if (active)
                     {
-                        if (active)
+                        if (!tempVFX)
                         {
-                            if (!tempVFX)
+                            GameObject gameObject = Object.Instantiate<GameObject>(vfxInfo.prefab, self.corePosition, Quaternion.identity);
+
+                            tempVFX = gameObject.GetComponent<MysticsRisky2UtilsTempVFX>();
+                            component.dictionary[vfxInfo.prefab] = tempVFX;
+                            tempVFX.parentTransform = self.coreTransform;
+                            tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Enter;
+                            tempVFX.healthComponent = self.healthComponent;
+                            tempVFX.radius = vfxInfo.radius(self);
+
+                            LocalCameraEffect localCameraEffect = gameObject.GetComponent<LocalCameraEffect>();
+                            if (localCameraEffect) localCameraEffect.targetCharacter = self.gameObject;
+
+                            if (!string.IsNullOrEmpty(vfxInfo.child))
                             {
-                                GameObject gameObject = Object.Instantiate<GameObject>(vfxInfo.prefab, self.corePosition, Quaternion.identity);
-                                
-                                tempVFX = gameObject.GetComponent<MysticsRisky2UtilsTempVFX>();
-                                component.dictionary[vfxInfo.prefab] = tempVFX;
-                                tempVFX.parentTransform = self.coreTransform;
-                                tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Enter;
-                                tempVFX.healthComponent = self.healthComponent;
-                                tempVFX.radius = vfxInfo.radius(self);
-
-                                LocalCameraEffect localCameraEffect = gameObject.GetComponent<LocalCameraEffect>();
-                                if (localCameraEffect) localCameraEffect.targetCharacter = self.gameObject;
-
-                                if (!string.IsNullOrEmpty(vfxInfo.child))
+                                ModelLocator modelLocator = self.modelLocator;
+                                if (modelLocator)
                                 {
-                                    ModelLocator modelLocator = self.modelLocator;
-                                    if (modelLocator)
+                                    Transform modelTransform = modelLocator.modelTransform;
+                                    if (modelTransform)
                                     {
-                                        Transform modelTransform = modelLocator.modelTransform;
-                                        if (modelTransform)
+                                        ChildLocator childLocator = modelTransform.GetComponent<ChildLocator>();
+                                        if (childLocator)
                                         {
-                                            ChildLocator childLocator = modelTransform.GetComponent<ChildLocator>();
-                                            if (childLocator)
+                                            Transform transform = childLocator.FindChild(vfxInfo.child);
+                                            if (transform)
                                             {
-                                                Transform transform = childLocator.FindChild(vfxInfo.child);
-                                                if (transform)
-                                                {
-                                                    tempVFX.parentTransform = transform;
-                                                    return;
-                                                }
+                                                tempVFX.parentTransform = transform;
+                                                return;
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                        else
-                        {
-                            if (tempVFX) tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Exit;
-                        }
+                        else tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Enter;
+                    }
+                    else
+                    {
+                        if (tempVFX) tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Exit;
                     }
                 }
             };
