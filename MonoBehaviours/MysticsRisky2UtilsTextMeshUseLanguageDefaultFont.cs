@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using RoR2.UI;
 
-namespace MysticsRisky2Utils
+namespace MysticsRisky2Utils.MonoBehaviours
 {
     public class MysticsRisky2UtilsTextMeshUseLanguageDefaultFont : MonoBehaviour
     {
