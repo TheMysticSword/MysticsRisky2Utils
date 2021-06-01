@@ -73,6 +73,11 @@ namespace MysticsRisky2Utils.ContentManagement
             }
         }
 
+        public static void InvokeAfterContentPackLoaded<T>(Assembly assembly)
+        {
+            InvokeAfterContentPackLoaded(assembly, typeof(T));
+        }
+
         public class AsyncLoadingEnumerator<OutType> : IEnumerator<object>, IEnumerator, System.IDisposable
         {
             object IEnumerator<object>.Current
