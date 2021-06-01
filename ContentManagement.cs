@@ -63,6 +63,16 @@ namespace MysticsRisky2Utils.ContentManagement
             PluginAwakeLoad(assembly, typeof(T));
         }
 
+        public static void InvokeAfterContentPackLoaded(Assembly assembly, System.Type loadType)
+        {
+            if (!CheckTypeIsLoadableAsset(loadType)) return;
+            foreach (System.Type type in GetAssemblyTypes(assembly).Where(x => !x.IsAbstract && loadType.IsAssignableFrom(x)).ToList())
+            {
+                BaseLoadableAsset loadableAsset = BaseLoadableAsset.Get(type);
+                loadableAsset.AfterContentPackLoaded();
+            }
+        }
+
         public class AsyncLoadingEnumerator<OutType> : IEnumerator<object>, IEnumerator, System.IDisposable
         {
             object IEnumerator<object>.Current
@@ -158,6 +168,7 @@ namespace MysticsRisky2Utils.ContentManagement
     {
         public object asset;
         public virtual void OnPluginAwake() { }
+        public virtual void AfterContentPackLoaded() { }
         public virtual void OnLoad() { }
         public virtual void Load()
         {
