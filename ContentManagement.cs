@@ -20,13 +20,19 @@ namespace MysticsRisky2Utils.ContentManagement
             coroutine = new ParallelProgressCoroutine(progress);
         }
 
+        public static bool CheckTypeIsLoadableAsset(System.Type type)
+        {
+            if (!typeof(BaseLoadableAsset).IsAssignableFrom(type))
+            {
+                MysticsRisky2UtilsPlugin.logger.LogError($"Attempted to load {type.Name} that does not inherit from {typeof(BaseLoadableAsset).Name}");
+                return false;
+            }
+            return true;
+        }
+
         public void DispatchLoad<OutType>(Assembly assembly, System.Type loadType, System.Action<OutType[]> onComplete = null)
         {
-            if (!typeof(BaseLoadableAsset).IsAssignableFrom(loadType))
-            {
-                MysticsRisky2UtilsPlugin.logger.LogError($"Attempted to load {loadType.Name} that does not inherit from {typeof(BaseLoadableAsset).Name}");
-                return;
-            }
+            if (!CheckTypeIsLoadableAsset(loadType)) return;
             AsyncLoadingEnumerator<OutType> enumerator = new AsyncLoadingEnumerator<OutType>(assembly, loadType);
             enumerator.onComplete = onComplete;
             coroutine.Add(enumerator, enumerator.progressReceiver);
@@ -34,11 +40,7 @@ namespace MysticsRisky2Utils.ContentManagement
 
         public static void PluginAwakeLoad(Assembly assembly, System.Type loadType)
         {
-            if (!typeof(BaseLoadableAsset).IsAssignableFrom(loadType))
-            {
-                MysticsRisky2UtilsPlugin.logger.LogError($"Attempted to load {loadType.Name} that does not inherit from {typeof(BaseLoadableAsset).Name} during plugin awake");
-                return;
-            }
+            if (!CheckTypeIsLoadableAsset(loadType)) return;
             foreach (System.Type type in GetAssemblyTypes(assembly).Where(x => !x.IsAbstract && loadType.IsAssignableFrom(x)).ToList())
             {
                 BaseLoadableAsset loadableAsset = BaseLoadableAsset.Get(type);
