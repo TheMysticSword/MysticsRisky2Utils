@@ -48,6 +48,11 @@ namespace MysticsRisky2Utils.ContentManagement
             }
         }
 
+        public static void PluginAwakeLoad<T>(Assembly assembly)
+        {
+            PluginAwakeLoad(assembly, typeof(T));
+        }
+
         public static Dictionary<string, System.Type[]> assemblyNameToTypes = new Dictionary<string, System.Type[]>();
         public static System.Type[] GetAssemblyTypes(Assembly assembly)
         {
@@ -56,11 +61,6 @@ namespace MysticsRisky2Utils.ContentManagement
             System.Type[] types = assembly.GetTypes();
             assemblyNameToTypes.Add(assemblyName, types);
             return types;
-        }
-
-        public static void PluginAwakeLoad<T>(Assembly assembly)
-        {
-            PluginAwakeLoad(assembly, typeof(T));
         }
 
         public static void InvokeAfterContentPackLoaded(Assembly assembly, System.Type loadType)
