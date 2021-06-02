@@ -13,6 +13,7 @@ namespace MysticsRisky2Utils
             if (network)
             {
                 gameObject.AddComponent<NetworkIdentity>();
+                gameObject.AddComponent<NetworkHelper.MysticsRisky2UtilsNetworkHelper>();
                 PrefabAPI.RegisterNetworkPrefab(gameObject);
             }
             return gameObject;
