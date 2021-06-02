@@ -1,4 +1,5 @@
 using R2API.Networking.Interfaces;
+using RoR2;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -13,10 +14,18 @@ namespace MysticsRisky2Utils
 
         public static void EnqueueOnSpawnedOnClientEvent(NetworkInstanceId netId, OnSpawnedOnClient onSpawnedOnClient)
         {
-            Queue<OnSpawnedOnClient> queue = null;
-            if (OnSpawnedOnClientDict.ContainsKey(netId)) queue = OnSpawnedOnClientDict[netId];
-            else OnSpawnedOnClientDict.Add(netId, new Queue<OnSpawnedOnClient>());
-            queue.Enqueue(onSpawnedOnClient);
+            GameObject gameObject = Util.FindNetworkObject(netId);
+            if (gameObject)
+            {
+                onSpawnedOnClient(gameObject);
+            }
+            else
+            {
+                Queue<OnSpawnedOnClient> queue = null;
+                if (OnSpawnedOnClientDict.ContainsKey(netId)) queue = OnSpawnedOnClientDict[netId];
+                else OnSpawnedOnClientDict.Add(netId, new Queue<OnSpawnedOnClient>());
+                queue.Enqueue(onSpawnedOnClient);
+            }
         }
 
         public class MysticsRisky2UtilsNetworkHelper : MonoBehaviour
