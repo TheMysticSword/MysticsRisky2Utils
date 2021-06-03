@@ -46,7 +46,7 @@ namespace MysticsRisky2Utils
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
                 orig(self, damageInfo, victim);
-                if (damageInfo.attacker && damageInfo.procCoefficient > 0f)
+                if (damageInfo.attacker)
                 {
                     CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
                     CharacterBody victimBody = victim ? victim.GetComponent<CharacterBody>() : null;
