@@ -21,10 +21,8 @@ namespace MysticsRisky2Utils
             }
             else
             {
-                Queue<OnSpawnedOnClient> queue = null;
-                if (OnSpawnedOnClientDict.ContainsKey(netId)) queue = OnSpawnedOnClientDict[netId];
-                else OnSpawnedOnClientDict.Add(netId, new Queue<OnSpawnedOnClient>());
-                queue.Enqueue(onSpawnedOnClient);
+                if (!OnSpawnedOnClientDict.ContainsKey(netId)) OnSpawnedOnClientDict.Add(netId, new Queue<OnSpawnedOnClient>()); 
+                OnSpawnedOnClientDict[netId].Enqueue(onSpawnedOnClient);
             }
         }
 
