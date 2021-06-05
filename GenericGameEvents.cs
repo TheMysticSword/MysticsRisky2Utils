@@ -52,7 +52,7 @@ namespace MysticsRisky2Utils
                     CharacterBody victimBody = victim ? victim.GetComponent<CharacterBody>() : null;
                     GenericCharacterInfo attackerInfo = new GenericCharacterInfo(attackerBody);
                     GenericCharacterInfo victimInfo = new GenericCharacterInfo(victimBody);
-                    if (attackerBody && victimBody && OnHitEnemy != null) OnHitEnemy(damageInfo, attackerInfo, victimInfo);
+                    if (OnHitEnemy != null) OnHitEnemy(damageInfo, attackerInfo, victimInfo);
                 }
             };
 
@@ -63,7 +63,7 @@ namespace MysticsRisky2Utils
                 {
                     CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
                     GenericCharacterInfo attackerInfo = new GenericCharacterInfo(attackerBody);
-                    if (attackerBody && OnHitAll != null) OnHitAll(damageInfo, attackerInfo);
+                    if (OnHitAll != null) OnHitAll(damageInfo, attackerInfo);
                 }
             };
 
