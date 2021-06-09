@@ -29,6 +29,8 @@ namespace MysticsRisky2Utils
             logger = Logger;
 
             BaseAssetTypes.BaseAchievement.Init();
+            BaseAssetTypes.BaseCharacterBody.Init();
+            BaseAssetTypes.BaseCharacterMaster.Init();
             BaseAssetTypes.BaseElite.Init();
             BaseAssetTypes.BaseEquipment.Init();
             BaseAssetTypes.BaseInteractable.Init();

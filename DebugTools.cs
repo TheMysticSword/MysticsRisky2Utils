@@ -28,6 +28,7 @@ namespace MysticsRisky2Utils
                 ConCommandHelper.Load(declaringType.GetMethod("CCClearMonsterItems", MysticsRisky2UtilsPlugin.bindingFlagAll));
                 ConCommandHelper.Load(declaringType.GetMethod("CCNotification", MysticsRisky2UtilsPlugin.bindingFlagAll));
                 ConCommandHelper.Load(declaringType.GetMethod("CCSpawnInteractable", MysticsRisky2UtilsPlugin.bindingFlagAll));
+                ConCommandHelper.Load(declaringType.GetMethod("CCSpawnAI", MysticsRisky2UtilsPlugin.bindingFlagAll));
 
                 On.RoR2.CharacterBody.Awake += (orig, self) =>
                 {
@@ -183,6 +184,38 @@ namespace MysticsRisky2Utils
                             },
                             RoR2Application.rng
                         ));
+                    }
+                }
+            }
+        }
+
+        [ConCommand(commandName = ConCommandPrefix + "ai", flags = ConVarFlags.ExecuteOnServer, helpText = "Spawn an AI controlled body")]
+        public static void CCSpawnAI(ConCommandArgs args)
+        {
+            CharacterSpawnCard characterSpawnCard = Resources.LoadAll<CharacterSpawnCard>("SpawnCards/CharacterSpawnCard").ToList().FirstOrDefault(x => x.name == args[0]);
+            if (!characterSpawnCard) characterSpawnCard = BaseAssetTypes.BaseCharacterMaster.characterSpawnCards.ToList().FirstOrDefault(x => x.name == args[0]);
+            if (characterSpawnCard)
+            {
+                Debug.Log("Spawning " + characterSpawnCard.name);
+                if (args.senderBody)
+                {
+                    RaycastHit hitInfo;
+                    if (args.senderBody.inputBank.GetAimRaycast(1000f, out hitInfo))
+                    {
+                        DirectorSpawnRequest directorSpawnRequest = new DirectorSpawnRequest(
+                            characterSpawnCard,
+                            new DirectorPlacementRule
+                            {
+                                placementMode = DirectorPlacementRule.PlacementMode.NearestNode,
+                                maxDistance = 100f,
+                                minDistance = 0f,
+                                position = hitInfo.point,
+                                preventOverhead = true
+                            },
+                            RoR2Application.rng
+                        );
+                        directorSpawnRequest.teamIndexOverride = args.Count >= 2 ? (TeamIndex)int.Parse(args[1]) : TeamIndex.Monster;
+                        characterSpawnCard.DoSpawn(hitInfo.point, Quaternion.identity, directorSpawnRequest);
                     }
                 }
             }
