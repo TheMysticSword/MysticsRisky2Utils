@@ -44,6 +44,7 @@ namespace MysticsRisky2Utils
             Overlays.Init();
             PlainHologram.Init();
             StateSerializerFix.Init();
+            Utils.Init();
 
             RoR2Application.onLoad += PostGameLoad;
         }

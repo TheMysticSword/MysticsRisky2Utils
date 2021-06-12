@@ -2,11 +2,18 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Reflection;
 using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 
 namespace MysticsRisky2Utils
 {
     public static class Utils
     {
+        internal static void Init()
+        {
+            NetworkingAPI.RegisterMessageType<SyncForceRecalculateStats>();
+        }
+
         public static GameObject CreateBlankPrefab(string name = "GameObject", bool network = false)
         {
             GameObject gameObject = PrefabAPI.InstantiateClone(new GameObject(name), name, false);
@@ -86,6 +93,50 @@ namespace MysticsRisky2Utils
         {
             if (originalString.EndsWith("(Clone)")) originalString = originalString.Remove(originalString.Length - "(Clone)".Length);
             return originalString;
+        }
+
+        public static void ForceRecalculateStats(RoR2.CharacterBody body)
+        {
+            body.RecalculateStats();
+            if (NetworkServer.active) new SyncForceRecalculateStats(body.netId);
+        }
+
+        private class SyncForceRecalculateStats : INetMessage
+        {
+            NetworkInstanceId objID;
+
+            public SyncForceRecalculateStats()
+            {
+            }
+
+            public SyncForceRecalculateStats(NetworkInstanceId objID)
+            {
+                this.objID = objID;
+            }
+
+            public void Deserialize(NetworkReader reader)
+            {
+                objID = reader.ReadNetworkId();
+            }
+
+            public void OnReceived()
+            {
+                if (NetworkServer.active) return;
+                GameObject obj = RoR2.Util.FindNetworkObject(objID);
+                if (obj)
+                {
+                    RoR2.CharacterBody component = obj.GetComponent<RoR2.CharacterBody>();
+                    if (component)
+                    {
+                        component.RecalculateStats();
+                    }
+                }
+            }
+
+            public void Serialize(NetworkWriter writer)
+            {
+                writer.Write(objID);
+            }
         }
     }
 }
