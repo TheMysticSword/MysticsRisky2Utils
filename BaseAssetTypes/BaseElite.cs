@@ -39,6 +39,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         {
             On.RoR2.CharacterModel.Awake += CharacterModel_Awake;
             IL.RoR2.CharacterModel.UpdateMaterials += CharacterModel_UpdateMaterials;
+            On.RoR2.CharacterModel.UpdateMaterials += CharacterModel_UpdateMaterials1;
             On.RoR2.CharacterModel.InstanceUpdate += CharacterModel_InstanceUpdate;
 
             On.RoR2.CombatDirector.Init += CombatDirector_Init;
@@ -116,22 +117,36 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             c.Emit(OpCodes.Ldarg, 0);
             c.EmitDelegate<System.Action<CharacterModel>>((characterModel) =>
             {
-                MysticsRisky2UtilsCustomEliteFields component = characterModel.gameObject.GetComponent<MysticsRisky2UtilsCustomEliteFields>();
+                MysticsRisky2UtilsCustomEliteFields component = characterModel.GetComponent<MysticsRisky2UtilsCustomEliteFields>();
                 if (component)
                 {
                     BaseElite customElite = elites.FirstOrDefault(x => x.eliteDef.eliteIndex == characterModel.myEliteIndex);
                     if (customElite != null)
                     {
-                        if (!component.eliteRampReplaced) component.eliteRampReplaced = true;
+                        component.resetEliteRampWhenAffixLost = true;
                         characterModel.propertyStorage.SetTexture(EliteRampPropertyID, customElite.recolorRamp);
                     }
-                    else if (component.eliteRampReplaced)
+                    else if (component.resetEliteRampWhenAffixLost)
                     {
-                        component.eliteRampReplaced = false;
+                        component.affixLost = true;
                         characterModel.propertyStorage.SetTexture(EliteRampPropertyID, Shader.GetGlobalTexture(EliteRampPropertyID));
                     }
                 }
             });
+        }
+
+        private static void CharacterModel_UpdateMaterials1(On.RoR2.CharacterModel.orig_UpdateMaterials orig, CharacterModel self)
+        {
+            orig(self);
+            MysticsRisky2UtilsCustomEliteFields component = self.GetComponent<MysticsRisky2UtilsCustomEliteFields>();
+            if (component)
+            {
+                if (component.affixLost)
+                {
+                    component.resetEliteRampWhenAffixLost = false;
+                    component.affixLost = false;
+                }
+            }
         }
 
         private static void CharacterModel_InstanceUpdate(On.RoR2.CharacterModel.orig_InstanceUpdate orig, CharacterModel self)
@@ -179,7 +194,8 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 
         private class MysticsRisky2UtilsCustomEliteFields : MonoBehaviour
         {
-            public bool eliteRampReplaced = false;
+            public bool resetEliteRampWhenAffixLost = false;
+            public bool affixLost = false;
             public GameObject modelEffect;
         }
     }
