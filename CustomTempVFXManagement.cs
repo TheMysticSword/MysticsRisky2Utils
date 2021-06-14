@@ -96,20 +96,26 @@ namespace MysticsRisky2Utils
             public VisualState visualState;
             public VisualState prevVisualState;
             public float radius;
+            private Transform cachedTransform;
+
+            public void Awake()
+            {
+                cachedTransform = transform;
+            }
 
             public void Start()
             {
                 RebuildVisuals();
             }
 
-            public void LateUpdate()
+            public void Update()
             {
                 if (!healthComponent || !healthComponent.alive) visualState = VisualState.Exit;
                 if (parentTransform)
                 {
-                    transform.position = parentTransform.position;
-                    if (rotateWithParent) transform.rotation = parentTransform.rotation;
-                    transform.localScale = Vector3.one * radius;
+                    cachedTransform.position = parentTransform.position;
+                    if (rotateWithParent) cachedTransform.rotation = parentTransform.rotation;
+                    cachedTransform.localScale = Vector3.one * radius;
                     if (visualState != prevVisualState)
                     {
                         prevVisualState = visualState;
