@@ -19,6 +19,8 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public GameObject modelEffect;
         public delegate void OnModelEffectSpawn(CharacterModel model, GameObject effect);
         public OnModelEffectSpawn onModelEffectSpawn;
+        public Color? lightColorOverride;
+        public Material particleMaterialOverride;
 
         public static List<BaseElite> elites = new List<BaseElite>();
 
@@ -155,6 +157,12 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             MysticsRisky2UtilsCustomEliteFields component = self.GetComponent<MysticsRisky2UtilsCustomEliteFields>();
             if (component)
             {
+                BaseElite currentCustomElite = elites.FirstOrDefault(x => x.eliteDef.eliteIndex == self.myEliteIndex);
+                if (currentCustomElite != null)
+                {
+                    self.lightColorOverride = currentCustomElite.lightColorOverride;
+                    self.particleMaterialOverride = currentCustomElite.particleMaterialOverride;
+                }
                 foreach (BaseElite customElite in elites.Where(x => x.modelEffect))
                 {
                     if ((self.myEliteIndex == customElite.eliteDef.eliteIndex) != component.modelEffect)
