@@ -29,8 +29,6 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             characterMaster.isBoss = false;
             characterMaster.preventGameOver = true;
 
-            SetDontDestroyOnLoad setDontDestroyOnLoad = prefab.AddComponent<SetDontDestroyOnLoad>();
-
             spawnCard = ScriptableObject.CreateInstance<CharacterSpawnCard>();
             spawnCard.name = TokenPrefix + "csc" + masterName;
             spawnCard.prefab = prefab;
