@@ -16,6 +16,9 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public EliteDef eliteDef;
         public Texture recolorRamp;
         public int tier = 0;
+        public GameObject modelEffect;
+        public delegate void OnModelEffectSpawn(CharacterModel model, GameObject effect);
+        public OnModelEffectSpawn onModelEffectSpawn;
 
         public static List<BaseElite> elites = new List<BaseElite>();
 
@@ -36,6 +39,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         {
             On.RoR2.CharacterModel.Awake += CharacterModel_Awake;
             IL.RoR2.CharacterModel.UpdateMaterials += CharacterModel_UpdateMaterials;
+            On.RoR2.CharacterModel.InstanceUpdate += CharacterModel_InstanceUpdate;
 
             On.RoR2.CombatDirector.Init += CombatDirector_Init;
             MethodInfo scriptedCombatEncounterSpawnHandler = typeof(ScriptedCombatEncounter).GetMethod("<Spawn>g__HandleSpawn|18_0", MysticsRisky2UtilsPlugin.bindingFlagAll);
@@ -130,6 +134,31 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             });
         }
 
+        private static void CharacterModel_InstanceUpdate(On.RoR2.CharacterModel.orig_InstanceUpdate orig, CharacterModel self)
+        {
+            orig(self);
+            MysticsRisky2UtilsCustomEliteFields component = self.GetComponent<MysticsRisky2UtilsCustomEliteFields>();
+            if (component)
+            {
+                foreach (BaseElite customElite in elites.Where(x => x.modelEffect))
+                {
+                    if ((self.myEliteIndex == customElite.eliteDef.eliteIndex) != component.modelEffect)
+                    {
+                        if (!component.modelEffect)
+                        {
+                            component.modelEffect = Object.Instantiate(customElite.modelEffect, self.transform);
+                            if (customElite.onModelEffectSpawn != null) customElite.onModelEffectSpawn(self, component.modelEffect);
+                        }
+                        else
+                        {
+                            Object.Destroy(component.modelEffect);
+                            component.modelEffect = null;
+                        }
+                    }
+                }
+            }
+        }
+
         private static void CombatDirector_Init(On.RoR2.CombatDirector.orig_Init orig)
         {
             orig();
@@ -151,6 +180,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         private class MysticsRisky2UtilsCustomEliteFields : MonoBehaviour
         {
             public bool eliteRampReplaced = false;
+            public GameObject modelEffect;
         }
     }
 }
