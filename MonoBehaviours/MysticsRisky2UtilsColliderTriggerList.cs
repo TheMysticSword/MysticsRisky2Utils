@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using RoR2;
+using System.Linq;
 
 namespace MysticsRisky2Utils.MonoBehaviours
 {
@@ -16,6 +18,11 @@ namespace MysticsRisky2Utils.MonoBehaviours
         {
             list.RemoveAll(x => !x); // remove colliders that don't exist anymore from the list
             return list;
+        }
+
+        public List<CharacterBody> RetrieveCharacterBodyList()
+        {
+            return RetrieveList().Select(x => x.GetComponent<CharacterBody>()).Where(x => x != null).Distinct().ToList();
         }
         
         public void OnTriggerEnter(Collider other)

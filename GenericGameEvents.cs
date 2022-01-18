@@ -20,6 +20,7 @@ namespace MysticsRisky2Utils
         public delegate void DamageReportEventHandler(DamageReport damageReport);
         public delegate void SceneRNGEventHandler(Xoroshiro128Plus rng);
         public delegate void InteractionEventHandler(Interactor interactor, IInteractable interactable, GameObject interactableObject, bool canProc);
+        public delegate void PlayerCharacterDeathEventHandler(DamageReport damageReport, ref string deathQuote);
 
         public static event DamageAttackerVictimEventHandler OnHitEnemy;
         public static event DamageAttackerEventHandler OnHitAll;
@@ -30,6 +31,7 @@ namespace MysticsRisky2Utils
         public static event DamageReportEventHandler OnTakeDamage;
         public static event SceneRNGEventHandler OnPopulateScene;
         public static event InteractionEventHandler OnInteractionBegin;
+        public static event PlayerCharacterDeathEventHandler OnPlayerCharacterDeath;
 
         internal static void ErrorHookFailed(string name)
         {
@@ -196,6 +198,32 @@ namespace MysticsRisky2Utils
                 InteractionProcFilter interactionProcFilter = interactableObject.GetComponent<InteractionProcFilter>();
                 if (interactionProcFilter) canProc = interactionProcFilter.shouldAllowOnInteractionBeginProc;
                 if (OnInteractionBegin != null) OnInteractionBegin(interactor, interactable, interactableObject, canProc);
+            };
+
+            IL.RoR2.GlobalEventManager.OnPlayerCharacterDeath += (il) =>
+            {
+                ILCursor c = new ILCursor(il);
+
+                int deathQuotePos = -1;
+
+                if (c.TryGotoNext(
+                    x => x.MatchLdstr("PLAYER_DEATH_QUOTE_VOIDDEATH"),
+                    x => x.MatchStloc(out deathQuotePos)
+                ) && c.TryGotoNext(
+                    x => x.MatchLdsfld<GlobalEventManager>("standardDeathQuoteTokens")
+                ) && c.TryGotoNext(
+                    MoveType.Before,
+                    x => x.MatchStloc(deathQuotePos)
+                ))
+                {
+                    c.Emit(OpCodes.Ldarg_1);
+                    c.EmitDelegate<System.Func<string, DamageReport, string>>((deathQuote, damageReport) =>
+                    {
+                        if (OnPlayerCharacterDeath != null) OnPlayerCharacterDeath(damageReport, ref deathQuote);
+                        return deathQuote;
+                    });
+                }
+                else ErrorHookFailed("on player character death");
             };
         }
 

@@ -30,7 +30,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             characterMaster.preventGameOver = true;
 
             spawnCard = ScriptableObject.CreateInstance<CharacterSpawnCard>();
-            spawnCard.name = TokenPrefix + "csc" + masterName;
+            spawnCard.name = "csc" + masterName;
             spawnCard.prefab = prefab;
             spawnCard.sendOverNetwork = true;
             spawnCard.hullSize = HullClassification.Human;

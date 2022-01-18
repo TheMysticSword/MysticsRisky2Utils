@@ -1,11 +1,11 @@
 using HG;
 using HG.Coroutines;
-using UnityEngine;
-using System.Reflection;
+using RoR2;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using RoR2;
+using System.Reflection;
+using UnityEngine;
 
 namespace MysticsRisky2Utils.ContentManagement
 {
@@ -159,14 +159,6 @@ namespace MysticsRisky2Utils.ContentManagement
                 return true;
             }
         }
-
-        public static void AddPrefixToAssets<T>(RoR2.ContentManagement.NamedAssetCollection<T> namedAssetCollection, string prefix) where T : Object
-        {
-            foreach (T asset in namedAssetCollection)
-            {
-                asset.name = prefix + asset.name;
-            }
-        }
     }
 
     public abstract class BaseLoadableAsset
@@ -180,12 +172,12 @@ namespace MysticsRisky2Utils.ContentManagement
             asset = this;
             OnLoad();
         }
-        public abstract string TokenPrefix { get; }
+        
+        private static Dictionary<System.Type, BaseLoadableAsset> staticAssetDictionary = new Dictionary<System.Type, BaseLoadableAsset>();
 
-        public static Dictionary<System.Type, BaseLoadableAsset> staticAssetDictionary = new Dictionary<System.Type, BaseLoadableAsset>();
-
-        public static BaseLoadableAsset Get(System.Type type)
+        internal static BaseLoadableAsset Get(System.Type type)
         {
+            if (staticAssetDictionary == null) return null;
             if (staticAssetDictionary.ContainsKey(type)) return staticAssetDictionary[type];
             else
             {
@@ -193,6 +185,12 @@ namespace MysticsRisky2Utils.ContentManagement
                 staticAssetDictionary.Add(type, obj);
                 return obj;
             }
+        }
+
+        internal static void DestroyStaticDict()
+        {
+            staticAssetDictionary.Clear();
+            staticAssetDictionary = null;
         }
     }
 }

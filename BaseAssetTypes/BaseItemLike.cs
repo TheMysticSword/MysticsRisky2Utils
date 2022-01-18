@@ -11,27 +11,30 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 {
     public abstract class BaseItemLike : BaseLoadableAsset
     {
-        public GameObject model;
-        public GameObject followerModel;
+        /// <summary>
+        /// Default item display prefab. Shortcut setter and getter for itemDisplayPrefabs["default"].
+        /// </summary>
+        public GameObject itemDisplayPrefab
+        {
+            get
+            {
+                if (itemDisplayPrefabs.ContainsKey("default")) return itemDisplayPrefabs["default"];
+                return null;
+            }
+            set
+            {
+                if (itemDisplayPrefabs.ContainsKey("default")) itemDisplayPrefabs["default"] = value;
+                else itemDisplayPrefabs.Add("default", value);
+            }
+        }
+        /// <summary>
+        /// Dictionary of named item display prefabs. Can be used for storing and retrieving multiple displays.
+        /// </summary>
+        public Dictionary<string, GameObject> itemDisplayPrefabs = new Dictionary<string, GameObject>();
         public ItemDisplayRuleDict itemDisplayRuleDict = new ItemDisplayRuleDict();
         public static event System.Action onSetupIDRS;
-
-        public abstract GameObject LoadModel(string assetName);
-        public abstract bool FollowerModelExists(string assetName);
-        public abstract GameObject LoadFollowerModel(string assetName);
-        public abstract Sprite LoadIconSprite(string assetName);
-
-        public abstract void PreLoad(); // Always executed before loading
-
-        public virtual void AfterTokensPopulated() { }
-
-        public virtual bool IsDisabledByConfig() { return false; }
-
-        public abstract void SetAssets(string assetName);
-
-        public abstract void SetIcon(string assetName);
-
-        public void PrepareModel(GameObject model)
+        
+        public GameObject PrepareModel(GameObject model)
         {
             model.AddComponent<MysticsRisky2UtilsItemFollowerVisualScaling>();
 
@@ -64,56 +67,16 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                     }
                 }
             }
+
+            return model;
         }
 
-        public void CopyModelToFollower()
-        {
-            string uniqueMaterialString = " (MysticsRisky2Utils Follower Mat)";
-
-            if (followerModel)
-            {
-                foreach (Renderer renderer in followerModel.GetComponentsInChildren<MeshRenderer>())
-                {
-                    Material material = renderer.material;
-                    if (material && material.name.Contains(uniqueMaterialString))
-                    {
-                        Object.Destroy(material);
-                    }
-                }
-                Object.Destroy(followerModel);
-            }
-            followerModel = PrefabAPI.InstantiateClone(model, model.name + "Follower", false);
-
-            void DuplicateRendererMaterial(Renderer renderer)
-            {
-                string newMaterialName = renderer.material.name + uniqueMaterialString;
-                renderer.material = Object.Instantiate(renderer.material);
-                renderer.material.name = newMaterialName;
-            }
-
-            Renderer firstRenderer = followerModel.GetComponentInChildren<MeshRenderer>();
-            if (firstRenderer)
-            {
-                Material firstRendererMaterial = firstRenderer.sharedMaterial;
-                foreach (Renderer renderer in followerModel.GetComponentsInChildren<MeshRenderer>())
-                {
-                    if (renderer != firstRenderer && renderer.material == firstRendererMaterial)
-                    {
-                        DuplicateRendererMaterial(renderer);
-                    }
-                }
-                DuplicateRendererMaterial(firstRenderer);
-            }
-
-            PrepareItemDisplayModel(followerModel);
-        }
-
-        public void PrepareItemDisplayModel(GameObject followerModel)
+        public GameObject PrepareItemDisplayModel(GameObject itemDisplayModel)
         {
             // Add ItemDisplay component for dither, flash and other HG effect support
-            ItemDisplay itemDisplay = followerModel.AddComponent<ItemDisplay>();
+            ItemDisplay itemDisplay = itemDisplayModel.AddComponent<ItemDisplay>();
             List<CharacterModel.RendererInfo> rendererInfos = new List<CharacterModel.RendererInfo>();
-            foreach (Renderer renderer in followerModel.GetComponentsInChildren<Renderer>())
+            foreach (Renderer renderer in itemDisplayModel.GetComponentsInChildren<Renderer>())
             {
                 CharacterModel.RendererInfo rendererInfo = new CharacterModel.RendererInfo
                 {
@@ -123,26 +86,8 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                 rendererInfos.Add(rendererInfo);
             }
             itemDisplay.rendererInfos = rendererInfos.ToArray();
-        }
 
-        public void SetModelPanelDistance(float min = 1f, float max = 10f)
-        {
-            ModelPanelParameters component = model.GetComponent<ModelPanelParameters>();
-            if (component)
-            {
-                component.minDistance = min;
-                component.maxDistance = max;
-            }
-        }
-
-        public Material GetModelMaterial()
-        {
-            return model.GetComponentInChildren<MeshRenderer>().sharedMaterial;
-        }
-
-        public Material GetFollowerModelMaterial()
-        {
-            return followerModel.GetComponentInChildren<MeshRenderer>().sharedMaterial;
+            return itemDisplayModel;
         }
 
         public struct MysticsRisky2UtilsItemDisplayRules
@@ -151,16 +96,16 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             public List<ItemDisplayRule> displayRules;
         }
 
-        public static Dictionary<string, List<MysticsRisky2UtilsItemDisplayRules>> displayRules = new Dictionary<string, List<MysticsRisky2UtilsItemDisplayRules>>();
-
+        public static Dictionary<string, List<MysticsRisky2UtilsItemDisplayRules>> perBodyDisplayRules = new Dictionary<string, List<MysticsRisky2UtilsItemDisplayRules>>();
+        
         public virtual void AddDisplayRule(string bodyName, string childName, Vector3 localPos, Vector3 localAngles, Vector3 localScale)
         {
-            AddDisplayRule(bodyName, childName, followerModel, localPos, localAngles, localScale);
+            AddDisplayRule(bodyName, childName, itemDisplayPrefab, localPos, localAngles, localScale);
         }
 
-        public virtual void AddDisplayRule(string bodyName, string childName, GameObject followerPrefab, Vector3 localPos, Vector3 localAngles, Vector3 localScale)
+        public virtual void AddDisplayRule(string bodyName, string childName, GameObject itemDisplayPrefab, Vector3 localPos, Vector3 localAngles, Vector3 localScale)
         {
-            displayRules.TryGetValue(bodyName, out List<MysticsRisky2UtilsItemDisplayRules> displayRulesList);
+            perBodyDisplayRules.TryGetValue(bodyName, out List<MysticsRisky2UtilsItemDisplayRules> displayRulesList);
             if (displayRulesList == null)
             {
                 displayRulesList = new List<MysticsRisky2UtilsItemDisplayRules>()
@@ -171,7 +116,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                         displayRules = new List<ItemDisplayRule>()
                     }
                 };
-                displayRules.Add(bodyName, displayRulesList);
+                perBodyDisplayRules.Add(bodyName, displayRulesList);
             }
             MysticsRisky2UtilsItemDisplayRules displayRulesForThisItem = default;
             if (displayRulesList.Any(x => x.baseItem == this))
@@ -190,7 +135,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             displayRulesForThisItem.displayRules.Add(new ItemDisplayRule
             {
                 ruleType = ItemDisplayRuleType.ParentedPrefab,
-                followerPrefab = followerPrefab,
+                followerPrefab = itemDisplayPrefab,
                 childName = childName,
                 localPos = localPos,
                 localAngles = localAngles,
@@ -198,22 +143,22 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             });
         }
 
-        public abstract void SetUnlockable();
-
         public abstract UnlockableDef GetUnlockableDef();
 
         public static void PostGameLoad()
         {
             if (onSetupIDRS != null) onSetupIDRS();
-            foreach (KeyValuePair<string, List<MysticsRisky2UtilsItemDisplayRules>> displayRulesList in displayRules)
+            foreach (KeyValuePair<string, List<MysticsRisky2UtilsItemDisplayRules>> displayRulesList in perBodyDisplayRules)
             {
                 string bodyName = displayRulesList.Key;
                 BodyIndex bodyIndex = BodyCatalog.FindBodyIndex(bodyName);
                 if (bodyIndex != BodyIndex.None)
                 {
+                    
                     GameObject bodyPrefab = BodyCatalog.GetBodyPrefab(bodyIndex);
                     CharacterModel characterModel = bodyPrefab.GetComponentInChildren<CharacterModel>();
                     ItemDisplayRuleSet idrs = characterModel.itemDisplayRuleSet;
+
                     foreach (MysticsRisky2UtilsItemDisplayRules displayRules in displayRulesList.Value)
                     {
                         BaseItemLike item = displayRules.baseItem;
@@ -224,7 +169,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                 }
                 else
                 {
-                    MysticsRisky2UtilsPlugin.logger.LogError("Body " + bodyName + " not found");
+                    MysticsRisky2UtilsPlugin.logger.LogWarning("Body \"" + bodyName + "\" not found for setting up item display rule sets");
                 }
             }
         }
@@ -321,12 +266,12 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             }
         }
 
-        public void SetScalableChildEffect(string childName)
+        public void SetScalableChildEffect(GameObject model, string childName)
         {
             GameObject child = model.transform.Find(childName).gameObject;
             if (child)
             {
-                SetScalableChildEffect(child);
+                SetScalableChildEffect(model, child);
             }
             else
             {
@@ -334,7 +279,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             }
         }
 
-        public void SetScalableChildEffect(GameObject child)
+        public void SetScalableChildEffect(GameObject model, GameObject child)
         {
             List<GameObject> effectObjects = model.GetComponent<MysticsRisky2UtilsItemFollowerVisualScaling>().effectObjects;
             if (!effectObjects.Contains(child)) effectObjects.Add(child);

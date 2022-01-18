@@ -20,7 +20,7 @@ namespace MysticsRisky2Utils
                     action = (Console.ConCommandDelegate)System.Delegate.CreateDelegate(
                         typeof(Console.ConCommandDelegate), methodInfo)
                 };
-                loadedConCommands.Add(attribute.commandName.ToLower(), conCommand);
+                loadedConCommands.Add(attribute.commandName.ToLower(System.Globalization.CultureInfo.InvariantCulture), conCommand);
             }
         }
 

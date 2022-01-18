@@ -14,12 +14,12 @@ namespace MysticsRisky2Utils
 {
     [BepInDependency(R2API.R2API.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-    [R2APISubmoduleDependency(nameof(NetworkingAPI), nameof(LanguageAPI), nameof(PrefabAPI), nameof(SoundAPI))]
+    [R2APISubmoduleDependency(nameof(NetworkingAPI), nameof(LanguageAPI), nameof(PrefabAPI), nameof(RecalculateStatsAPI), nameof(SoundAPI))]
     public class MysticsRisky2UtilsPlugin : BaseUnityPlugin
     {
         public const string PluginGUID = "com.themysticsword.mysticsrisky2utils";
         public const string PluginName = "MysticsRisky2Utils";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.0.1";
 
         internal static BepInEx.Logging.ManualLogSource logger;
         internal const BindingFlags bindingFlagAll = (BindingFlags)(-1);
@@ -34,11 +34,12 @@ namespace MysticsRisky2Utils
             BaseAssetTypes.BaseElite.Init();
             BaseAssetTypes.BaseEquipment.Init();
             BaseAssetTypes.BaseInteractable.Init();
+            CharacterModelMaterialOverrides.Init();
             ChildLocatorAdditions.Init();
-            CharacterStats.Init();
             ConCommandHelper.Init();
             CostTypeCreation.Init();
             CustomTempVFXManagement.Init();
+            DamageColorAPI.Init();
             GenericChildLocatorAdditions.Init();
             GenericGameEvents.Init();
             Overlays.Init();
@@ -52,6 +53,7 @@ namespace MysticsRisky2Utils
         public void PostGameLoad()
         {
             BaseAssetTypes.BaseItemLike.PostGameLoad();
+            ContentManagement.BaseLoadableAsset.DestroyStaticDict();
         }
 
         public struct GenericCharacterInfo

@@ -71,7 +71,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             }
 
             spawnCard = ScriptableObject.CreateInstance<InteractableSpawnCard>();
-            spawnCard.name = TokenPrefix + "isc" + GetType().Name;
+            spawnCard.name = "isc" + GetType().Name;
             spawnCard.prefab = prefab;
             spawnCard.sendOverNetwork = true;
             spawnCard.hullSize = HullClassification.Human;

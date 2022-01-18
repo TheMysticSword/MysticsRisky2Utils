@@ -9,10 +9,13 @@ namespace MysticsRisky2Utils.BaseAssetTypes
     public abstract class BaseEquipment : BaseItemLike
     {
         public EquipmentDef equipmentDef;
-        public static List<BaseEquipment> loadedEquipment = new List<BaseEquipment>();
         public static List<BaseEquipment> equipmentThatUsesTargetFinder = new List<BaseEquipment>();
         public TargetFinderType targetFinderType = TargetFinderType.None;
         public GameObject targetFinderVisualizerPrefab;
+        /// <summary>
+        /// Dictionary of all loaded equipment as instances of BaseEquipment. Keys are equal to BaseEquipment.equipmentDef.name field values.
+        /// </summary>
+        public static Dictionary<string, BaseEquipment> loadedDictionary = new Dictionary<string, BaseEquipment>();
 
         public enum TargetFinderType
         {
@@ -25,56 +28,10 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public override void Load()
         {
             equipmentDef = ScriptableObject.CreateInstance<EquipmentDef>();
-            PreLoad();
-            bool disabled = false;
-            if (equipmentDef.canDrop) disabled = IsDisabledByConfig();
-            string name = equipmentDef.name;
-            equipmentDef.name = TokenPrefix + equipmentDef.name;
+            OnLoad();
             equipmentDef.AutoPopulateTokens();
-            equipmentDef.name = name;
-            AfterTokensPopulated();
-            if (!disabled)
-            {
-                OnLoad();
-                loadedEquipment.Add(this);
-            }
-            else
-            {
-                equipmentDef.canDrop = false;
-                equipmentDef.enigmaCompatible = false;
-            }
+            loadedDictionary.Add(equipmentDef.name, this);
             asset = equipmentDef;
-        }
-
-        public override void SetAssets(string assetName)
-        {
-            model = LoadModel(assetName);
-            model.name = "mdl" + equipmentDef.name;
-
-            bool followerModelSeparate = FollowerModelExists(assetName);
-            if (followerModelSeparate)
-            {
-                followerModel = LoadFollowerModel(assetName);
-                followerModel.name = "mdl" + equipmentDef.name + "Follower";
-            }
-
-            PrepareModel(model);
-            if (followerModelSeparate)
-            {
-                PrepareModel(followerModel);
-                PrepareItemDisplayModel(followerModel);
-            }
-
-            // Separate the follower model from the pickup model for adding different visual effects to followers
-            if (!followerModelSeparate) CopyModelToFollower();
-
-            equipmentDef.pickupModelPrefab = model;
-            SetIcon(assetName);
-        }
-
-        public override void SetIcon(string assetName)
-        {
-            equipmentDef.pickupIconSprite = LoadIconSprite(assetName);
         }
 
         public override PickupIndex GetPickupIndex()
@@ -99,7 +56,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             {
                 if (NetworkServer.active)
                 {
-                    BaseEquipment equipment = loadedEquipment.FirstOrDefault(x => x.equipmentDef == equipmentDef2);
+                    BaseEquipment equipment = loadedDictionary.Values.FirstOrDefault(x => x.equipmentDef == equipmentDef2);
                     if (equipment != null)
                     {
                         return equipment.OnUse(self);
@@ -112,7 +69,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             {
                 orig(self);
                 EquipmentIndex equipmentIndex2 = self.equipmentIndex;
-                BaseEquipment equipment = loadedEquipment.FirstOrDefault(x => x.equipmentDef.equipmentIndex == equipmentIndex2);
+                BaseEquipment equipment = loadedDictionary.Values.FirstOrDefault(x => x.equipmentDef.equipmentIndex == equipmentIndex2);
                 if (equipment != null)
                 {
                     equipment.OnUseClient(self);
@@ -185,8 +142,8 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             if (!equipmentDef.unlockableDef)
             {
                 equipmentDef.unlockableDef = ScriptableObject.CreateInstance<UnlockableDef>();
-                equipmentDef.unlockableDef.cachedName = TokenPrefix + "Equipment." + equipmentDef.name;
-                equipmentDef.unlockableDef.nameToken = ("EQUIPMENT_" + TokenPrefix + equipmentDef.name + "_NAME").ToUpper();
+                equipmentDef.unlockableDef.cachedName = "Equipment." + equipmentDef.name;
+                equipmentDef.unlockableDef.nameToken = ("EQUIPMENT_" + equipmentDef.name + "_NAME").ToUpper(System.Globalization.CultureInfo.InvariantCulture);
             }
             return equipmentDef.unlockableDef;
         }

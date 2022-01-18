@@ -24,15 +24,12 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 
         public static List<BaseElite> elites = new List<BaseElite>();
 
-        public abstract Texture LoadRecolorRamp(string assetName);
-
         public override void Load()
         {
             eliteDef = ScriptableObject.CreateInstance<EliteDef>();
             OnLoad();
-            eliteDef.modifierToken = "ELITE_MODIFIER_" + TokenPrefix.ToUpper() + eliteDef.name.ToUpper();
+            eliteDef.modifierToken = "ELITE_MODIFIER_" + eliteDef.name.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
             eliteDef.shaderEliteRampIndex = 0;
-            recolorRamp = LoadRecolorRamp(eliteDef.name);
             asset = eliteDef;
             elites.Add(this);
         }

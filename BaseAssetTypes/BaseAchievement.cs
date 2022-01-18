@@ -16,14 +16,11 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public System.Type trackerType;
         public System.Type serverTrackerType;
         public AchievementDef achievementDef;
-
-        public abstract Sprite LoadSprite(string assetName);
+        public Sprite iconSprite;
 
         public override void Load()
         {
             OnLoad();
-            string nameNoToken = name;
-            name = TokenPrefix + name;
             achievementDef = new AchievementDef
             {
                 identifier = name,
@@ -31,15 +28,18 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                 prerequisiteAchievementIdentifier = prerequisiteName,
                 nameToken = "ACHIEVEMENT_" + name.ToUpper(CultureInfo.InvariantCulture) + "_NAME",
                 descriptionToken = "ACHIEVEMENT_" + name.ToUpper(CultureInfo.InvariantCulture) + "_DESCRIPTION",
-                achievedIcon = LoadSprite(nameNoToken),
+                achievedIcon = iconSprite,
                 type = trackerType,
                 serverTrackerType = serverTrackerType
             };
-            registeredAchievements.Add(this);
+            loadedDictionary.Add(name, this);
             asset = achievementDef;
         }
 
-        public static List<BaseAchievement> registeredAchievements = new List<BaseAchievement>();
+        /// <summary>
+        /// Dictionary of all loaded achievements as instances of BaseAchievement. Keys are equal to BaseAchievement.name field values.
+        /// </summary>
+        public static Dictionary<string, BaseAchievement> loadedDictionary = new Dictionary<string, BaseAchievement>();
 
         internal static void Init()
         {
@@ -57,7 +57,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                     c.Emit(OpCodes.Ldarg_0);
                     c.EmitDelegate<System.Action<List<AchievementDef>, List<string>, Dictionary<string, AchievementDef>>>((list, achievementIdentifiers, map) =>
                     {
-                        foreach (BaseAchievement achievement in registeredAchievements)
+                        foreach (BaseAchievement achievement in loadedDictionary.Values)
                         {
                             AchievementDef achievementDef = achievement.achievementDef;
                             achievementIdentifiers.Add(achievement.name);

@@ -5,36 +5,49 @@ namespace MysticsRisky2Utils
 {
     public static class HopooShaderToMaterial
     {
-        public struct Properties
+        public class Properties
         {
-            public Dictionary<string, float> floats;
-            public Dictionary<string, Color> colors;
-            public Dictionary<string, Texture> textures;
+            public Dictionary<string, float> floats = new Dictionary<string, float>();
+            public Dictionary<string, Color> colors = new Dictionary<string, Color>();
+            public Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
+            public Dictionary<string, Vector2> textureOffsets = new Dictionary<string, Vector2>();
+            public Dictionary<string, Vector2> textureScales = new Dictionary<string, Vector2>();
         }
 
-        public static void Apply(Material mat, Shader shader, Properties properties = default(Properties))
+        public static void Apply(Material mat, Shader shader, Properties properties = null)
         {
             mat.shader = shader;
-            if (properties.floats != null) foreach (KeyValuePair<string, float> keyValuePair in properties.floats) mat.SetFloat(keyValuePair.Key, keyValuePair.Value);
-            if (properties.colors != null) foreach (KeyValuePair<string, Color> keyValuePair in properties.colors) mat.SetColor(keyValuePair.Key, keyValuePair.Value);
-            if (properties.textures != null) foreach (KeyValuePair<string, Texture> keyValuePair in properties.textures) mat.SetTexture(keyValuePair.Key, keyValuePair.Value);
+            if (properties == null) properties = new Properties();
+            foreach (KeyValuePair<string, float> keyValuePair in properties.floats) mat.SetFloat(keyValuePair.Key, keyValuePair.Value);
+            foreach (KeyValuePair<string, Color> keyValuePair in properties.colors) mat.SetColor(keyValuePair.Key, keyValuePair.Value);
+            foreach (KeyValuePair<string, Texture> keyValuePair in properties.textures) mat.SetTexture(keyValuePair.Key, keyValuePair.Value);
+            foreach (KeyValuePair<string, Vector2> keyValuePair in properties.textureOffsets) mat.SetTextureOffset(keyValuePair.Key, keyValuePair.Value);
+            foreach (KeyValuePair<string, Vector2> keyValuePair in properties.textureScales) mat.SetTextureScale(keyValuePair.Key, keyValuePair.Value);
         }
 
         public class Standard
         {
             public static Shader shader = Resources.Load<Shader>("shaders/deferred/hgstandard");
 
-            public static void Apply(Material mat, Properties properties = default(Properties))
+            public static void Apply(Material mat, Properties properties = null)
             {
+                if (properties == null) properties = new Properties();
+                if (mat.HasProperty("_BumpScale")) properties.floats.Add("_NormalStrength", mat.GetFloat("_BumpScale"));
+                if (mat.HasProperty("_BumpMap"))
+                {
+                    properties.textures.Add("_NormalTex", mat.GetTexture("_BumpMap"));
+                    properties.textureOffsets.Add("_NormalTex", mat.GetTextureOffset("_BumpMap"));
+                    properties.textureScales.Add("_NormalTex", mat.GetTextureScale("_BumpMap"));
+                }
+                if (mat.HasProperty("_EmTex"))
+                {
+                    properties.textures.Add("_EmTex", mat.GetTexture("_EmissionMap"));
+                    properties.textureOffsets.Add("_EmTex", mat.GetTextureOffset("_EmissionMap"));
+                    properties.textureScales.Add("_EmTex", mat.GetTextureScale("_EmissionMap"));
+                }
                 HopooShaderToMaterial.Apply(mat, shader, properties);
-                mat.SetTexture("_NormalTex", mat.GetTexture("_BumpMap"));
-                mat.SetTexture("_EmTex", mat.GetTexture("_EmissionMap"));
             }
-            public static void Apply(params Material[] mats)
-            {
-                foreach (Material mat in mats) Apply(mat);
-            }
-
+            
             public static void DisableEverything(Material mat)
             {
                 mat.DisableKeyword("DITHER");
@@ -70,6 +83,11 @@ namespace MysticsRisky2Utils
                 mat.EnableKeyword("FRESNEL_EMISSION");
                 mat.SetFloat("_EmPower", power);
                 mat.SetColor("_EmColor", color ?? Color.white);
+                if (power == 0)
+                {
+                    mat.DisableKeyword("_EMISSION");
+                    mat.DisableKeyword("FRESNEL_EMISSION");
+                }
             }
         }
 
@@ -79,6 +97,7 @@ namespace MysticsRisky2Utils
 
             public static void Apply(Material mat, Properties properties = default(Properties))
             {
+                if (properties == null) properties = new Properties();
                 HopooShaderToMaterial.Apply(mat, shader, properties);
                 mat.SetFloat("_AlphaBias", 0f);
                 mat.SetFloat("_AlphaBoost", 1f);

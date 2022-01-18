@@ -1,64 +1,25 @@
 using RoR2;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MysticsRisky2Utils.BaseAssetTypes
 {
     public abstract class BaseItem : BaseItemLike
     {
         public ItemDef itemDef;
-        public static List<BaseItem> loadedItems = new List<BaseItem>();
-        
+        /// <summary>
+        /// Dictionary of all loaded items as instances of BaseItem. Keys are equal to BaseItem.itemDef.name field values.
+        /// </summary>
+        public static Dictionary<string, BaseItem> loadedDictionary = new Dictionary<string, BaseItem>();
+
         public override void Load()
         {
             itemDef = ScriptableObject.CreateInstance<ItemDef>();
-            PreLoad();
-            bool disabled = false;
-            if (itemDef.inDroppableTier) disabled = IsDisabledByConfig();
-            string name = itemDef.name;
-            itemDef.name = TokenPrefix + itemDef.name;
+            OnLoad();
             itemDef.AutoPopulateTokens();
-            itemDef.name = name;
-            AfterTokensPopulated();
-            if (!disabled) {
-                OnLoad();
-                loadedItems.Add(this);
-            } else
-            {
-                itemDef.tier = ItemTier.NoTier;
-            }
+            loadedDictionary.Add(itemDef.name, this);
             asset = itemDef;
-        }
-
-        public override void SetAssets(string assetName)
-        {
-            model = LoadModel(assetName);
-            model.name = "mdl" + itemDef.name;
-
-            bool followerModelSeparate = FollowerModelExists(assetName);
-            if (followerModelSeparate)
-            {
-                followerModel = LoadFollowerModel(assetName);
-                followerModel.name = "mdl" + itemDef.name + "Follower";
-            }
-
-            PrepareModel(model);
-            if (followerModelSeparate)
-            {
-                PrepareModel(followerModel);
-                PrepareItemDisplayModel(followerModel);
-            }
-
-            // Separate the follower model from the pickup model for adding different visual effects to followers
-            if (!followerModelSeparate) CopyModelToFollower();
-
-            itemDef.pickupModelPrefab = model;
-            SetIcon(assetName);
-        }
-
-        public override void SetIcon(string assetName)
-        {
-            itemDef.pickupIconSprite = LoadIconSprite(assetName);
         }
 
         public override UnlockableDef GetUnlockableDef()
@@ -66,8 +27,8 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             if (!itemDef.unlockableDef)
             {
                 itemDef.unlockableDef = ScriptableObject.CreateInstance<UnlockableDef>();
-                itemDef.unlockableDef.cachedName = TokenPrefix + "Items." + itemDef.name;
-                itemDef.unlockableDef.nameToken = ("ITEM_" + TokenPrefix + itemDef.name + "_NAME").ToUpper();
+                itemDef.unlockableDef.cachedName = "Items." + itemDef.name;
+                itemDef.unlockableDef.nameToken = ("ITEM_" + itemDef.name + "_NAME").ToUpper(System.Globalization.CultureInfo.InvariantCulture);
             }
             return itemDef.unlockableDef;
         }
@@ -75,17 +36,6 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public override PickupIndex GetPickupIndex()
         {
             return PickupCatalog.FindPickupIndex(itemDef.itemIndex);
-        }
-
-        public float ModifierTimesFunction(MysticsRisky2UtilsPlugin.GenericCharacterInfo genericCharacterInfo, bool stacks = true)
-        {
-            if (genericCharacterInfo.inventory)
-            {
-                int itemCount = genericCharacterInfo.inventory.GetItemCount(itemDef);
-                if (stacks) return itemCount;
-                else return itemCount > 0 ? 1f : 0f;
-            }
-            return 0f;
         }
     }
 }

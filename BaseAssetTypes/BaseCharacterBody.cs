@@ -22,12 +22,9 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public GameObject meshObject;
         public string bodyName;
 
-        public static Dictionary<string, BaseCharacterBody> keyToBody = new Dictionary<string, BaseCharacterBody>();
-
         public override void Load()
         {
             OnLoad();
-            keyToBody.Add(bodyName, this);
             asset = prefab;
         }
 
@@ -36,8 +33,8 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             SkillLocator skillLocator = prefab.AddComponent<SkillLocator>();
             TeamComponent teamComponent = prefab.AddComponent<TeamComponent>();
             CharacterBody characterBody = prefab.AddComponent<CharacterBody>();
-            characterBody.baseNameToken = TokenPrefix.ToUpper() + bodyName.ToUpper() + "_BODY_NAME";
-            characterBody.subtitleNameToken = TokenPrefix.ToUpper() + bodyName.ToUpper() + "_BODY_SUBTITLE";
+            characterBody.baseNameToken = bodyName.ToUpper(System.Globalization.CultureInfo.InvariantCulture) + "_BODY_NAME";
+            characterBody.subtitleNameToken = bodyName.ToUpper(System.Globalization.CultureInfo.InvariantCulture) + "_BODY_SUBTITLE";
             HealthComponent healthComponent = prefab.AddComponent<HealthComponent>();
             InputBankTest inputBank = prefab.AddComponent<InputBankTest>();
             InteractionDriver interactionDriver = prefab.AddComponent<InteractionDriver>();
@@ -70,7 +67,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             CharacterModel characterModel = modelTransform.gameObject.AddComponent<CharacterModel>();
             characterModel.body = characterBody;
             ItemDisplayRuleSet idrs = ScriptableObject.CreateInstance<ItemDisplayRuleSet>();
-            idrs.name = TokenPrefix + "idrs" + bodyName;
+            idrs.name = "idrs" + bodyName;
             characterModel.itemDisplayRuleSet = idrs;
 
             // Apply HG shader

@@ -4,6 +4,7 @@ using System.Reflection;
 using R2API;
 using R2API.Networking;
 using R2API.Networking.Interfaces;
+using System.Collections.Generic;
 
 namespace MysticsRisky2Utils
 {
@@ -137,6 +138,99 @@ namespace MysticsRisky2Utils
             {
                 writer.Write(objID);
             }
+        }
+
+        public enum ItemIconBackgroundType
+        {
+            Tier1,
+            Tier2,
+            Tier3,
+            Boss,
+            Equipment,
+            Lunar,
+            Survivor
+        }
+
+        public static Sprite AddItemIconBackgroundToSprite(Sprite originalSprite, ItemIconBackgroundType bgType)
+        {
+            Texture2D loadedOriginalTexture = originalSprite.texture;
+            
+            Texture2D originalTexture = new Texture2D(loadedOriginalTexture.width, loadedOriginalTexture.height, TextureFormat.ARGB32, false);
+            Graphics.ConvertTexture(loadedOriginalTexture, originalTexture);
+            RenderTexture renderTexture = RenderTexture.GetTemporary(originalTexture.width, originalTexture.height, 24, RenderTextureFormat.ARGB32);
+            renderTexture.Create();
+            RenderTexture.active = renderTexture;
+            Graphics.Blit(originalTexture, renderTexture);
+            originalTexture.ReadPixels(new Rect(0, 0, originalTexture.width, originalTexture.height), 0, 0);
+            originalTexture.Apply();
+            RenderTexture.active = null;
+            RenderTexture.ReleaseTemporary(renderTexture);
+
+            Sprite loadedBackground = null;
+            switch (bgType)
+            {
+                case ItemIconBackgroundType.Tier1:
+                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texTier1BGIcon");
+                    break;
+                case ItemIconBackgroundType.Tier2:
+                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texTier2BGIcon");
+                    break;
+                case ItemIconBackgroundType.Tier3:
+                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texTier3BGIcon");
+                    break;
+                case ItemIconBackgroundType.Boss:
+                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texBossBGIcon");
+                    break;
+                case ItemIconBackgroundType.Equipment:
+                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texEquipmentBGIcon");
+                    break;
+                case ItemIconBackgroundType.Lunar:
+                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texLunarBGIcon");
+                    break;
+                case ItemIconBackgroundType.Survivor:
+                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texSurvivorBGIcon");
+                    break;
+                default:
+                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texTier1BGIcon");
+                    break;
+            }
+
+            Texture2D backgroundTexture = new Texture2D(originalTexture.width, originalTexture.height, TextureFormat.ARGB32, false);
+            Graphics.ConvertTexture(loadedBackground.texture, backgroundTexture);
+            renderTexture = RenderTexture.GetTemporary(backgroundTexture.width, backgroundTexture.height, 24, RenderTextureFormat.ARGB32);
+            renderTexture.Create();
+            RenderTexture.active = renderTexture;
+            Graphics.Blit(backgroundTexture, renderTexture);
+            backgroundTexture.ReadPixels(new Rect(0, 0, backgroundTexture.width, backgroundTexture.height), 0, 0);
+            backgroundTexture.Apply();
+            RenderTexture.active = null;
+            RenderTexture.ReleaseTemporary(renderTexture);
+
+            Texture2D newTexture = new Texture2D(originalTexture.width, originalTexture.height, originalTexture.format, false);
+            newTexture.wrapMode = originalTexture.wrapMode;
+            newTexture.filterMode = originalTexture.filterMode;
+            for (var x = 0; x < newTexture.width; x++)
+                for (var y = 0; y < newTexture.height; y++)
+                {
+                    Color backgroundPixel = backgroundTexture.GetPixel(x, y);
+                    Color originalPixel = originalTexture.GetPixel(x, y);
+                    newTexture.SetPixel(x, y, new Color(
+                        backgroundPixel.r * (1 - originalPixel.a) + originalPixel.r * originalPixel.a,
+                        backgroundPixel.g * (1 - originalPixel.a) + originalPixel.g * originalPixel.a,
+                        backgroundPixel.b * (1 - originalPixel.a) + originalPixel.b * originalPixel.a,
+                        Mathf.Clamp01(backgroundPixel.a + originalPixel.a)
+                    ));
+                }
+            newTexture.Apply();
+
+            Sprite newSprite = Sprite.Create(newTexture, new Rect(0, 0, newTexture.width, newTexture.height), new Vector2(0.5f, 0.5f), 25f, 1u, SpriteMeshType.Tight);
+            return newSprite;
+        }
+
+        public static string FormatStringByDict(string str, Dictionary<string, string> dict)
+        {
+            foreach (var kvp in dict) str = str.Replace("{" + kvp.Key + "}", kvp.Value);
+            return str;
         }
     }
 }
