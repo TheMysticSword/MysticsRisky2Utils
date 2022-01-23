@@ -86,6 +86,7 @@ namespace MysticsRisky2Utils
 
             to.transform.SetParent(parent);
             to.name = trueName;
+            to.layer = from.layer;
 
             if (cloneFromThenDestroy) Object.Destroy(from);
         }
