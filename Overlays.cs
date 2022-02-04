@@ -30,15 +30,12 @@ namespace MysticsRisky2Utils
                 {
                     foreach (OverlayInfo overlayInfo in overlays)
                     {
-                        if (self.GetFieldValue<int>("activeOverlayCount") >= typeof(CharacterModel).GetFieldValue<int>("maxOverlays"))
-                        {
-                            return;
-                        }
+                        if (self.activeOverlayCount >= CharacterModel.maxOverlays) return;
                         if (overlayInfo.condition(self))
                         {
-                            Material[] array = self.GetFieldValue<Material[]>("currentOverlays");
-                            int num = self.GetFieldValue<int>("activeOverlayCount");
-                            self.SetFieldValue("activeOverlayCount", num + 1);
+                            Material[] array = self.currentOverlays;
+                            int num = self.activeOverlayCount;
+                            self.activeOverlayCount = num + 1;
                             array[num] = overlayInfo.material;
                         }
                     }
