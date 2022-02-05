@@ -1,4 +1,4 @@
-#### 1.0.1:
+#### 2.0.0:
 * Added XML documentation for fields that can be used by mods that soft-depend on this mod
 * Removed CharacterStats class in favour of R2API's RecalculateStatsAPI
 * Added RetrieveCharacterBodyList to MysticsRisky2UtilsColliderTriggerList component

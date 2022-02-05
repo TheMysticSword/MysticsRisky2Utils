@@ -6,5 +6,6 @@ DO NOT use this library for creating your own mods.
 ---
 ### End-user changelog:
 * Fixed movement speed hooks failing to set up
+* Fixed a memory issue with temporary character model overlays
   
 (Full changelog with all the technical details can be found [here](https://github.com/TheMysticSword/MysticsRisky2Utils/blob/main/CHANGELOG.md))
