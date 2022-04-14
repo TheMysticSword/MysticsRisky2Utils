@@ -126,8 +126,7 @@ namespace MysticsRisky2Utils
         [ConCommand(commandName = ConCommandPrefix + "interactable", flags = ConVarFlags.ExecuteOnServer, helpText = "Spawn an interactable")]
         public static void CCSpawnInteractable(ConCommandArgs args)
         {
-            InteractableSpawnCard interactableSpawnCard = Resources.LoadAll<InteractableSpawnCard>("SpawnCards/InteractableSpawnCard").ToList().FirstOrDefault(x => x.name == args[0]);
-            if (!interactableSpawnCard) interactableSpawnCard = BaseAssetTypes.BaseInteractable.interactableSpawnCards.ToList().FirstOrDefault(x => x.name == args[0]);
+            InteractableSpawnCard interactableSpawnCard = BaseAssetTypes.BaseInteractable.interactableSpawnCards.ToList().FirstOrDefault(x => x.name == args[0]);
             if (interactableSpawnCard)
             {
                 Debug.Log("Spawning " + interactableSpawnCard.name);
@@ -155,8 +154,7 @@ namespace MysticsRisky2Utils
         [ConCommand(commandName = ConCommandPrefix + "ai", flags = ConVarFlags.ExecuteOnServer, helpText = "Spawn an AI controlled body")]
         public static void CCSpawnAI(ConCommandArgs args)
         {
-            CharacterSpawnCard characterSpawnCard = Resources.LoadAll<CharacterSpawnCard>("SpawnCards/CharacterSpawnCard").ToList().FirstOrDefault(x => x.name == args[0]);
-            if (!characterSpawnCard) characterSpawnCard = BaseAssetTypes.BaseCharacterMaster.characterSpawnCards.ToList().FirstOrDefault(x => x.name == args[0]);
+            CharacterSpawnCard characterSpawnCard = BaseAssetTypes.BaseCharacterMaster.characterSpawnCards.ToList().FirstOrDefault(x => x.name == args[0]);
             if (characterSpawnCard)
             {
                 Debug.Log("Spawning " + characterSpawnCard.name);
