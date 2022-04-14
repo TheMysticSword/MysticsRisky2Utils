@@ -76,7 +76,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                 }
             };
 
-            On.RoR2.EquipmentSlot.Awake += (orig, self) =>
+            On.RoR2.EquipmentSlot.Start += (orig, self) =>
             {
                 orig(self);
                 self.gameObject.AddComponent<MysticsRisky2UtilsEquipmentTarget>();
