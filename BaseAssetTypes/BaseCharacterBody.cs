@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MysticsRisky2Utils.ContentManagement;
+using UnityEngine.AddressableAssets;
 
 namespace MysticsRisky2Utils.BaseAssetTypes
 {
@@ -218,12 +219,18 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             pingInfoProvider.pingIconOverride = pingIconOverride;
         }
 
-        public static CharacterCameraParams ccpStandard;
-
-        internal static void Init()
+        private static CharacterCameraParams _ccpStandard;
+        public static CharacterCameraParams ccpStandard
         {
-            GameObject commandoBody = Resources.Load<GameObject>("Prefabs/CharacterBodies/CommandoBody");
-            ccpStandard = commandoBody.GetComponent<CameraTargetParams>().cameraParams;
+            get
+            {
+                if (!_ccpStandard)
+                {
+                    GameObject commandoBody = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoBody.prefab").WaitForCompletion();
+                    _ccpStandard = commandoBody.GetComponent<CameraTargetParams>().cameraParams;
+                }
+                return _ccpStandard;
+            }
         }
     }
 }
