@@ -77,9 +77,4 @@ namespace MysticsRisky2Utils
             }
         }
     }
-
-    public interface IMysticsRisky2UtilsTokenPrefixProvider
-    {
-        string GetTokenPrefix();
-    }
 }
