@@ -15,110 +15,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\core\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp.R2API.mm">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\monomod\Assembly-CSharp.R2API.mm.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\core\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Harmony">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\core\BepInEx.Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.MonoMod.Loader">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\patchers\BepInEx.MonoMod.Loader\BepInEx.MonoMod.Loader.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Preloader">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\core\BepInEx.Preloader.dll</HintPath>
-    </Reference>
-    <Reference Include="HGCSharpUtils">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\HGCSharpUtils.dll</HintPath>
-    </Reference>
-    <Reference Include="HGUnityUtils">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\HGUnityUtils.dll</HintPath>
-    </Reference>
-    <Reference Include="MMHOOK_Assembly-CSharp">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\plugins\R2API\MMHOOK_Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\core\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Mdb">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\core\Mono.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\core\Mono.Cecil.Pdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.Utils">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\core\MonoMod.Utils.dll</HintPath>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.0.*">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="BepInEx.Core" Version="5.4.19" />
+    <PackageReference Include="RiskOfRain2.GameLibs" Version="1.2.1-r.0" />
+    <PackageReference Include="UnityEngine.Modules" Version="2019.4.26" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MMHOOK_RoR2">
+      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\MMHOOK_RoR2.dll</HintPath>
     </Reference>
     <Reference Include="R2API">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\BepInEx\plugins\R2API\R2API.dll</HintPath>
+      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\R2API.dll</HintPath>
     </Reference>
-    <Reference Include="Rewired_Core">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\Rewired_Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Rewired_CSharp">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\Rewired_CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Rewired_Windows_Lib">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\Rewired_Windows_Lib.dll</HintPath>
-    </Reference>
-    <Reference Include="SimpleJSON">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\SimpleJSON.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Postprocessing.Runtime">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\Unity.Postprocessing.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\Unity.TextMeshPro.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.AnimationModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ClothModule">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.ClothModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.PhysicsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIElementsModule">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.UIElementsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\UnityEngine.UIModule.dll</HintPath>
-    </Reference>
-    <Reference Include="Wwise">
-      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\Wwise.dll</HintPath>
+    <Reference Include="Unity.ResourceManager">
+      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\Unity.ResourceManager.dll</HintPath>
     </Reference>
   </ItemGroup>
 
