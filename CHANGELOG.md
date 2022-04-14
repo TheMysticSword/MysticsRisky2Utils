@@ -1,3 +1,11 @@
+#### 2.0.2:
+* Standard CameraTargetParams and PlainHologram are no longer loaded on plugin Awake
+	* This fixes an issue with the game hanging up for a few seconds before the rest of the game content starts loading
+* Added MysticsRisky2UtilsObjectTransformCurveLoop MonoBehaviour
+* Removed StateSerializerFix as it's no longer needed
+#### 2.0.1:
+* Updated project references to work with the 1st March 2022 version of the game
+* Removed the mr2u_notification console command
 #### 2.0.0:
 * Added XML documentation for fields that can be used by mods that soft-depend on this mod
 * Removed CharacterStats class in favour of R2API's RecalculateStatsAPI
