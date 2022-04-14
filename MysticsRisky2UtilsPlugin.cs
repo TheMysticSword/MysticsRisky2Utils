@@ -29,7 +29,6 @@ namespace MysticsRisky2Utils
             logger = Logger;
 
             BaseAssetTypes.BaseAchievement.Init();
-            BaseAssetTypes.BaseCharacterBody.Init();
             BaseAssetTypes.BaseCharacterMaster.Init();
             BaseAssetTypes.BaseElite.Init();
             BaseAssetTypes.BaseEquipment.Init();
@@ -43,8 +42,6 @@ namespace MysticsRisky2Utils
             GenericChildLocatorAdditions.Init();
             GenericGameEvents.Init();
             Overlays.Init();
-            PlainHologram.Init();
-            StateSerializerFix.Init();
             Utils.Init();
 
             RoR2Application.onLoad += PostGameLoad;
