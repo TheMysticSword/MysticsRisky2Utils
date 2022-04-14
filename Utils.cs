@@ -5,6 +5,8 @@ using R2API;
 using R2API.Networking;
 using R2API.Networking.Interfaces;
 using System.Collections.Generic;
+using RoR2;
+using UnityEngine.AddressableAssets;
 
 namespace MysticsRisky2Utils
 {
@@ -171,28 +173,28 @@ namespace MysticsRisky2Utils
             switch (bgType)
             {
                 case ItemIconBackgroundType.Tier1:
-                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texTier1BGIcon");
+                    loadedBackground = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texTier1BGIcon.png").WaitForCompletion();
                     break;
                 case ItemIconBackgroundType.Tier2:
-                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texTier2BGIcon");
+                    loadedBackground = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texTier2BGIcon.png").WaitForCompletion();
                     break;
                 case ItemIconBackgroundType.Tier3:
-                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texTier3BGIcon");
+                    loadedBackground = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texTier3BGIcon.png").WaitForCompletion();
                     break;
                 case ItemIconBackgroundType.Boss:
-                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texBossBGIcon");
+                    loadedBackground = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texBossBGIcon.png").WaitForCompletion();
                     break;
                 case ItemIconBackgroundType.Equipment:
-                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texEquipmentBGIcon");
+                    loadedBackground = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texEquipmentBGIcon.png").WaitForCompletion();
                     break;
                 case ItemIconBackgroundType.Lunar:
-                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texLunarBGIcon");
+                    loadedBackground = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texLunarBGIcon.png").WaitForCompletion();
                     break;
                 case ItemIconBackgroundType.Survivor:
-                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texSurvivorBGIcon");
+                    loadedBackground = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texSurvivorBGIcon.png").WaitForCompletion();
                     break;
                 default:
-                    loadedBackground = Resources.Load<Sprite>("Textures/ItemIcons/BG/texTier1BGIcon");
+                    loadedBackground = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/texTier1BGIcon.png").WaitForCompletion();
                     break;
             }
 

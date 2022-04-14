@@ -1,3 +1,4 @@
+using RoR2;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,7 +28,7 @@ namespace MysticsRisky2Utils
 
         public class Standard
         {
-            public static Shader shader = Resources.Load<Shader>("shaders/deferred/hgstandard");
+            public static Shader shader = LegacyShaderAPI.Find("Hopoo Games/Deferred/Standard");
 
             public static void Apply(Material mat, Properties properties = null)
             {
@@ -93,7 +94,7 @@ namespace MysticsRisky2Utils
 
         public class CloudRemap
         {
-            public static Shader shader = Resources.Load<Shader>("shaders/fx/hgcloudremap");
+            public static Shader shader = LegacyShaderAPI.Find("Hopoo Games/FX/Cloud Remap");
 
             public static void Apply(Material mat, Properties properties = default(Properties))
             {
