@@ -42,7 +42,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             On.RoR2.CharacterModel.InstanceUpdate += CharacterModel_InstanceUpdate;
 
             On.RoR2.CombatDirector.Init += CombatDirector_Init;
-            MethodInfo scriptedCombatEncounterSpawnHandler = typeof(ScriptedCombatEncounter).GetMethod("<Spawn>g__HandleSpawn|18_0", MysticsRisky2UtilsPlugin.bindingFlagAll);
+            MethodInfo scriptedCombatEncounterSpawnHandler = typeof(ScriptedCombatEncounter).GetMethod("<Spawn>g__HandleSpawn|21_0", MysticsRisky2UtilsPlugin.bindingFlagAll);
             if (scriptedCombatEncounterSpawnHandler != null)
             {
                 ILHook h = new ILHook(
@@ -89,7 +89,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             } else
             {
                 MysticsRisky2UtilsPlugin.logger.LogWarning("Failed to add custom elites to ScriptedCombatEncounter's Artifact of Honor elite list. Alloy Worship Unit, Aurelionite and other scripted combat encounter enemies cannot become custom elites.");
-                MysticsRisky2UtilsPlugin.logger.LogWarning("(for TheMysticSword: ScriptedCombatEncounter HandleSpawn method no longer exists)");
+                MysticsRisky2UtilsPlugin.logger.LogWarning("(for TheMysticSword: ScriptedCombatEncounter HandleSpawn method was changed)");
             }
         }
 
