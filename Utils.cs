@@ -153,6 +153,19 @@ namespace MysticsRisky2Utils
             Lunar,
             Survivor
         }
+        private static Dictionary<ItemTier, ItemIconBackgroundType> itemTierToIconBackgroundType = new Dictionary<ItemTier, ItemIconBackgroundType>()
+        {
+            { ItemTier.Tier1, ItemIconBackgroundType.Tier1 },
+            { ItemTier.Tier2, ItemIconBackgroundType.Tier2 },
+            { ItemTier.Tier3, ItemIconBackgroundType.Tier3 },
+            { ItemTier.Boss, ItemIconBackgroundType.Boss },
+            { ItemTier.Lunar, ItemIconBackgroundType.Lunar }
+        };
+        public static ItemIconBackgroundType GetItemIconBackgroundTypeFromTier(ItemTier tier)
+        {
+            if (itemTierToIconBackgroundType.ContainsKey(tier)) return itemTierToIconBackgroundType[tier];
+            return ItemIconBackgroundType.Tier1;
+        }
 
         public static Sprite AddItemIconBackgroundToSprite(Sprite originalSprite, ItemIconBackgroundType bgType)
         {
