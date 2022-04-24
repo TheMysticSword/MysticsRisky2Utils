@@ -29,6 +29,8 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                 itemDef.unlockableDef = ScriptableObject.CreateInstance<UnlockableDef>();
                 itemDef.unlockableDef.cachedName = "Items." + itemDef.name;
                 itemDef.unlockableDef.nameToken = ("ITEM_" + itemDef.name + "_NAME").ToUpper(System.Globalization.CultureInfo.InvariantCulture);
+                
+                itemDef.unlockableDef.achievementIcon = MysticsRisky2Utils.Utils.CreateItemIconWithBackgroundFromItem(itemDef);
             }
             return itemDef.unlockableDef;
         }

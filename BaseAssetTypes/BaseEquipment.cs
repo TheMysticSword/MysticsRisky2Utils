@@ -144,6 +144,8 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                 equipmentDef.unlockableDef = ScriptableObject.CreateInstance<UnlockableDef>();
                 equipmentDef.unlockableDef.cachedName = "Equipment." + equipmentDef.name;
                 equipmentDef.unlockableDef.nameToken = ("EQUIPMENT_" + equipmentDef.name + "_NAME").ToUpper(System.Globalization.CultureInfo.InvariantCulture);
+
+                equipmentDef.unlockableDef.achievementIcon = MysticsRisky2Utils.Utils.CreateItemIconWithBackgroundFromEquipment(equipmentDef);
             }
             return equipmentDef.unlockableDef;
         }

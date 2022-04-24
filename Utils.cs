@@ -243,6 +243,24 @@ namespace MysticsRisky2Utils
             return newSprite;
         }
 
+        public static Sprite CreateItemIconWithBackgroundFromItem(ItemDef itemDef)
+        {
+            if (itemDef && itemDef.pickupIconSprite)
+            {
+                return AddItemIconBackgroundToSprite(itemDef.pickupIconSprite, GetItemIconBackgroundTypeFromTier(itemDef.tier));
+            }
+            return null;
+        }
+
+        public static Sprite CreateItemIconWithBackgroundFromEquipment(EquipmentDef equipmentDef)
+        {
+            if (equipmentDef && equipmentDef.pickupIconSprite)
+            {
+                return AddItemIconBackgroundToSprite(equipmentDef.pickupIconSprite, ItemIconBackgroundType.Equipment);
+            }
+            return null;
+        }
+
         public static string FormatStringByDict(string str, Dictionary<string, string> dict)
         {
             foreach (var kvp in dict) str = str.Replace("{" + kvp.Key + "}", kvp.Value);
