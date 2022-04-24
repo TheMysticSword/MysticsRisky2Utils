@@ -39,5 +39,13 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         {
             return PickupCatalog.FindPickupIndex(itemDef.itemIndex);
         }
+
+        public void SetItemTierWhenAvailable(ItemTier tier)
+        {
+            ItemTierCatalog.availability.CallWhenAvailable(() =>
+            {
+                if (itemDef) itemDef.tier = tier;
+            });
+        }
     }
 }
