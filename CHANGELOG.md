@@ -1,3 +1,10 @@
+#### 2.0.3:
+* Recompiled against the 1.2.3 version of the game to update certain references
+* Removed BaseAssetTypes.BaseAchievement
+	* Dependent mods should migrate to the RoR2.RegisterAchievement attribute
+* Added BrotherInfection static class
+* Added BaseItem.SetItemTierWhenAvailable method
+* Fixed GenericGameEvents.OnPopulateScene crashing the game
 #### 2.0.2:
 * Standard CameraTargetParams and PlainHologram are no longer loaded on plugin Awake
 	* This fixes an issue with the game hanging up for a few seconds before the rest of the game content starts loading
