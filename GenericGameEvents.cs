@@ -171,15 +171,20 @@ namespace MysticsRisky2Utils
                 ILCursor c = new ILCursor(il);
 
                 ILLabel label = null;
+                int rngPos = -1;
 
                 if (c.TryGotoNext(
                     x => x.MatchCallOrCallvirt<SceneInfo>("get_instance"),
                     x => x.MatchCallOrCallvirt<SceneInfo>("get_countsAsStage"),
                     x => x.MatchBrfalse(out label)
+                ) && c.TryGotoNext(
+                    x => x.MatchLdfld<SceneDirector>("rng")
+                ) && c.TryGotoNext(
+                    x => x.MatchStloc(out rngPos)
                 ))
                 {
                     c.GotoLabel(label);
-                    c.Emit(OpCodes.Ldloc, 11);
+                    c.Emit(OpCodes.Ldloc, rngPos);
                     c.EmitDelegate<System.Action<Xoroshiro128Plus>>((xoroshiro128Plus) =>
                     {
                         if (SceneInfo.instance.countsAsStage)
