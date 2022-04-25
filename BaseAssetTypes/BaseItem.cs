@@ -44,7 +44,18 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         {
             ItemTierCatalog.availability.CallWhenAvailable(() =>
             {
-                if (itemDef) itemDef.tier = tier;
+                if (itemDef)
+                {
+                    itemDef.tier = tier;
+                    try
+                    {
+                        itemDef.deprecatedTier = tier;
+                    }
+                    catch (System.Exception e)
+                    {
+                        MysticsRisky2UtilsPlugin.logger.LogWarning("Error setting deprecatedTier: " + e);
+                    }
+                }
             });
         }
     }
