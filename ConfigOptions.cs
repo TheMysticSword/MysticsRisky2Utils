@@ -81,11 +81,11 @@ namespace MysticsRisky2Utils
                     var existingCast = existing as ConfigurableValue<T>;
                     bepinexConfigEntry = existingCast.bepinexConfigEntry;
                     this.useDefaultValueConfigEntry = useDefaultValueConfigEntry;
-                    instancesList.Add(this);
                 }
                 else
                 {
                     bepinexConfigEntry = configFile.Bind<T>(section, key, defaultValue, description);
+                    instancesList.Add(this);
                 }
 
                 this.useDefaultValueConfigEntry = useDefaultValueConfigEntry;
