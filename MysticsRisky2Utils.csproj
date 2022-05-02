@@ -31,6 +31,9 @@
     <Reference Include="R2API">
       <HintPath>..\..\..\..\Risk of Rain 2\Modding References\R2API.dll</HintPath>
     </Reference>
+    <Reference Include="RiskOfOptions">
+      <HintPath>..\..\..\..\Risk of Rain 2\Modding References\RiskOfOptions.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.ResourceManager">
       <HintPath>..\..\..\..\Risk of Rain 2\Modding References\Managed\Unity.ResourceManager.dll</HintPath>
     </Reference>

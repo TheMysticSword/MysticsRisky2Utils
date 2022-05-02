@@ -13,6 +13,7 @@ using RoR2;
 namespace MysticsRisky2Utils
 {
     [BepInDependency(R2API.R2API.PluginGUID)]
+    [BepInDependency("com.rune580.riskofoptions", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     [R2APISubmoduleDependency(nameof(NetworkingAPI), nameof(LanguageAPI), nameof(PrefabAPI), nameof(RecalculateStatsAPI), nameof(SoundAPI))]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
@@ -43,6 +44,7 @@ namespace MysticsRisky2Utils
             GenericGameEvents.Init();
             Overlays.Init();
             Utils.Init();
+            SoftDependencies.SoftDependencyManager.Init();
 
             RoR2Application.onLoad += PostGameLoad;
         }
