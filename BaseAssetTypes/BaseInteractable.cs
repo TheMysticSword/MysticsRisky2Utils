@@ -131,7 +131,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 
         public event System.Action<GameObject, Interactor, MysticsRisky2UtilsPurchasableInteractable> onPurchase;
 
-        public void AddDirectorCardTo(string sceneName, string categoryName, DirectorCard directorCard)
+        public static void AddDirectorCardTo(string sceneName, string categoryName, DirectorCard directorCard)
         {
             Dictionary<string, List<DirectorCard>> categoryCards;
             if (sceneCategoryCards.ContainsKey(sceneName)) categoryCards = sceneCategoryCards[sceneName];
