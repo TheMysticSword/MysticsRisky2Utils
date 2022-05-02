@@ -9,7 +9,19 @@ namespace MysticsRisky2Utils
     {
         internal static void Init()
         {
+            On.RoR2.UI.LogBook.LogBookController.Awake += LogBookController_Awake;
             On.RoR2.Language.GetLocalizedStringByToken += Language_GetLocalizedStringByToken;
+        }
+
+        private static bool reloadLogbook = false;
+        private static void LogBookController_Awake(On.RoR2.UI.LogBook.LogBookController.orig_Awake orig, RoR2.UI.LogBook.LogBookController self)
+        {
+            orig(self);
+            if (reloadLogbook)
+            {
+                reloadLogbook = false;
+                RoR2.UI.LogBook.LogBookController.BuildStaticData();
+            }
         }
 
         private static string Language_GetLocalizedStringByToken(On.RoR2.Language.orig_GetLocalizedStringByToken orig, RoR2.Language self, string token)
@@ -96,7 +108,11 @@ namespace MysticsRisky2Utils
 
                 if (onChanged != null)
                 {
-                    bepinexConfigEntry.SettingChanged += (x, y) => onChanged(bepinexConfigEntry.Value);
+                    bepinexConfigEntry.SettingChanged += (x, y) =>
+                    {
+                        onChanged(bepinexConfigEntry.Value);
+                        reloadLogbook = true;
+                    };
                     onChanged(bepinexConfigEntry.Value);
                 }
             }
