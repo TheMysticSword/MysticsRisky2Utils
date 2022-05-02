@@ -30,12 +30,12 @@ namespace MysticsRisky2Utils
             public string key = "";
             public string id = "";
 
-            public static ConfigurableValue<T> Create<T>(ConfigFile configFile, string section, string key, T defaultValue, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, EventHandler onChanged = null)
+            public static ConfigurableValue<T> Create<T>(ConfigFile configFile, string section, string key, T defaultValue, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, Action<T> onChanged = null)
             {
                 return new ConfigurableValue<T>(configFile, section, key, defaultValue, description, stringsToAffect, useDefaultValueConfigEntry, restartRequired, onChanged);
             }
 
-            public static ConfigurableValue<int> CreateInt(string modGUID, string modName, ConfigFile configFile, string section, string key, int defaultValue, int min = 0, int max = 1000, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, EventHandler onChanged = null)
+            public static ConfigurableValue<int> CreateInt(string modGUID, string modName, ConfigFile configFile, string section, string key, int defaultValue, int min = 0, int max = 1000, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, Action<int> onChanged = null)
             {
                 var configurableValue = Create<int>(configFile, section, key, defaultValue, description, stringsToAffect, useDefaultValueConfigEntry, restartRequired, onChanged);
                 if (SoftDependencies.SoftDependencyManager.RiskOfOptionsDependency.enabled)
@@ -45,7 +45,7 @@ namespace MysticsRisky2Utils
                 return configurableValue;
             }
 
-            public static ConfigurableValue<float> CreateFloat(string modGUID, string modName, ConfigFile configFile, string section, string key, float defaultValue, float min = 0, float max = 1000, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, EventHandler onChanged = null)
+            public static ConfigurableValue<float> CreateFloat(string modGUID, string modName, ConfigFile configFile, string section, string key, float defaultValue, float min = 0, float max = 1000, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, Action<float> onChanged = null)
             {
                 var configurableValue = Create<float>(configFile, section, key, defaultValue, description, stringsToAffect, useDefaultValueConfigEntry, restartRequired, onChanged);
                 if (SoftDependencies.SoftDependencyManager.RiskOfOptionsDependency.enabled)
@@ -55,7 +55,7 @@ namespace MysticsRisky2Utils
                 return configurableValue;
             }
 
-            public static ConfigurableValue<bool> CreateBool(string modGUID, string modName, ConfigFile configFile, string section, string key, bool defaultValue, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, EventHandler onChanged = null)
+            public static ConfigurableValue<bool> CreateBool(string modGUID, string modName, ConfigFile configFile, string section, string key, bool defaultValue, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, Action<bool> onChanged = null)
             {
                 var configurableValue = Create<bool>(configFile, section, key, defaultValue, description, stringsToAffect, useDefaultValueConfigEntry, restartRequired, onChanged);
                 if (SoftDependencies.SoftDependencyManager.RiskOfOptionsDependency.enabled)
@@ -72,7 +72,7 @@ namespace MysticsRisky2Utils
             private ConfigEntry<bool> useDefaultValueConfigEntry;
             private T defaultValue;
 
-            public ConfigurableValue(ConfigFile configFile, string section, string key, T defaultValue, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, EventHandler onChanged = null)
+            public ConfigurableValue(ConfigFile configFile, string section, string key, T defaultValue, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, Action<T> onChanged = null)
             {
                 id = System.IO.Path.GetFileNameWithoutExtension(configFile.ConfigFilePath) + "." + section + "." + key;
                 var existing = instancesList.FirstOrDefault(x => x.id == id);
@@ -96,8 +96,8 @@ namespace MysticsRisky2Utils
 
                 if (onChanged != null)
                 {
-                    bepinexConfigEntry.SettingChanged += onChanged;
-                    onChanged(bepinexConfigEntry, new SettingChangedEventArgs(bepinexConfigEntry));
+                    bepinexConfigEntry.SettingChanged += (x, y) => onChanged(bepinexConfigEntry.Value);
+                    onChanged(bepinexConfigEntry.Value);
                 }
             }
 
