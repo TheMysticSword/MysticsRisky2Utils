@@ -152,6 +152,19 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             cards.Add(directorCard);
         }
 
+        public static void RemoveDirectorCardFrom(string sceneName, string categoryName, DirectorCard directorCard)
+        {
+            Dictionary<string, List<DirectorCard>> categoryCards;
+            if (!sceneCategoryCards.ContainsKey(sceneName)) return;
+            categoryCards = sceneCategoryCards[sceneName];
+
+            List<DirectorCard> cards;
+            if (!categoryCards.ContainsKey(categoryName)) return;
+            cards = categoryCards[categoryName];
+
+            if (cards.Contains(directorCard)) cards.Remove(directorCard);
+        }
+
         public void SetUpEntityStateMachine()
         {
             EntityStateMachine entityStateMachine = prefab.AddComponent<EntityStateMachine>();
