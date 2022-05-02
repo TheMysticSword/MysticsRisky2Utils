@@ -37,6 +37,7 @@ namespace MysticsRisky2Utils
             CharacterModelMaterialOverrides.Init();
             ChildLocatorAdditions.Init();
             ConCommandHelper.Init();
+            ConfigOptions.Init();
             CostTypeCreation.Init();
             CustomTempVFXManagement.Init();
             DamageColorAPI.Init();
