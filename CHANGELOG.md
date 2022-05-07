@@ -1,3 +1,9 @@
+#### 2.0.4:
+* Added ConfigOptions
+* Added SoftDependencyManager
+* Added Risk of Options soft dependency
+* Converted BaseInteractable.AddDirectorCardTo to static
+* Added BaseInteractable.RemoveDirectorCardFrom
 #### 2.0.3:
 * Recompiled against the 1.2.3 version of the game to update certain references
 * Removed BaseAssetTypes.BaseAchievement
