@@ -1,3 +1,5 @@
+#### 2.0.5:
+* Fix the mod not reloading the logbook on ConfigurableValue creation
 #### 2.0.4:
 * Added ConfigOptions
 * Added SoftDependencyManager

@@ -5,6 +5,6 @@ DO NOT use this library for creating your own mods.
 
 ---
 ### End-user changelog:
-* Dependent mods now can add Risk of Options support
+* Fixed items from dependent mods appearing in the Logbook despite being disabled in configs
   
 (Full changelog with all the technical details can be found [here](https://github.com/TheMysticSword/MysticsRisky2Utils/blob/main/CHANGELOG.md))

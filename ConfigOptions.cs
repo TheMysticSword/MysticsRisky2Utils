@@ -114,6 +114,7 @@ namespace MysticsRisky2Utils
                         reloadLogbook = true;
                     };
                     onChanged(bepinexConfigEntry.Value);
+                    reloadLogbook = true;
                 }
             }
 
