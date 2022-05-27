@@ -39,7 +39,7 @@ namespace MysticsRisky2Utils
             int childCount = from.transform.childCount;
             for (var i = 0; i < childCount; i++)
             {
-                from.transform.GetChild(0).SetParent(to.transform);
+                from.transform.GetChild(0).SetParent(to.transform, false);
             }
             foreach (Component fromComponent in from.GetComponents<Component>())
             {
