@@ -46,7 +46,8 @@ namespace MysticsRisky2Utils
                 System.Type componentType = fromComponent.GetType();
 
                 Component toComponent = to.GetComponent(componentType);
-                if (!toComponent) toComponent = to.AddComponent(componentType);
+                if (componentType != typeof(Transform) && (System.Attribute.GetCustomAttribute(componentType, typeof(DisallowMultipleComponent)) == null || !toComponent))
+                    toComponent = to.AddComponent(componentType);
 
                 bool isAnimator = typeof(Animator).IsAssignableFrom(fromComponent.GetType());
                 bool animatorLogWarnings = false;
@@ -60,7 +61,7 @@ namespace MysticsRisky2Utils
                     toAnimator.logWarnings = false;
                 }
 
-                BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default;
+                BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default | BindingFlags.FlattenHierarchy;
                 foreach (PropertyInfo propertyInfo in componentType.GetProperties(flags))
                 {
                     if (propertyInfo.CanWrite)
