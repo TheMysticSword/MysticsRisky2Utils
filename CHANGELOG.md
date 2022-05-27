@@ -1,3 +1,6 @@
+#### 2.0.6:
+* Fixed CopyChildren setting the children positions to wrong values
+* BaseItem deprecatedTier is now set immediately
 #### 2.0.5:
 * Fix the mod not reloading the logbook on ConfigurableValue creation
 #### 2.0.4:
