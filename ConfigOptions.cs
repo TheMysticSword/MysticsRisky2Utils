@@ -76,6 +76,16 @@ namespace MysticsRisky2Utils
                 }
                 return configurableValue;
             }
+
+            public static ConfigurableValue<string> CreateString(string modGUID, string modName, ConfigFile configFile, string section, string key, string defaultValue, string description = "", List<string> stringsToAffect = null, ConfigEntry<bool> useDefaultValueConfigEntry = null, bool restartRequired = false, Action<string> onChanged = null)
+            {
+                var configurableValue = Create<string>(configFile, section, key, defaultValue, description, stringsToAffect, useDefaultValueConfigEntry, restartRequired, onChanged);
+                if (SoftDependencies.SoftDependencyManager.RiskOfOptionsDependency.enabled)
+                {
+                    SoftDependencies.SoftDependencyManager.RiskOfOptionsDependency.AddOptionString(modGUID, modName, configurableValue.bepinexConfigEntry, restartRequired: restartRequired);
+                }
+                return configurableValue;
+            }
         }
 
         public class ConfigurableValue<T> : ConfigurableValue

@@ -39,5 +39,14 @@ namespace MysticsRisky2Utils.SoftDependencies
         {
             ModSettingsManager.AddOption(new CheckBoxOption(configEntry, restartRequired), modGUID, modName);
         }
+
+        public static void AddOptionString(string modGUID, string modName, ConfigEntry<string> configEntry, bool restartRequired)
+        {
+            ModSettingsManager.AddOption(new StringInputFieldOption(configEntry, new InputFieldConfig
+            {
+                submitOn = InputFieldConfig.SubmitEnum.OnExitOrSubmit,
+                restartRequired = restartRequired
+            }), modGUID, modName);
+        }
     }
 }

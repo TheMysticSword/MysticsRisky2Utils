@@ -38,6 +38,11 @@ namespace MysticsRisky2Utils.SoftDependencies
             {
                 RiskOfOptionsDependencyInternal.AddOptionBool(modGUID, modName, configEntry, restartRequired);
             }
+
+            public static void AddOptionString(string modGUID, string modName, ConfigEntry<string> configEntry, bool restartRequired = false)
+            {
+                RiskOfOptionsDependencyInternal.AddOptionString(modGUID, modName, configEntry, restartRequired);
+            }
         }
     }
 }
