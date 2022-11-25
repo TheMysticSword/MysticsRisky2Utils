@@ -1,3 +1,12 @@
+#### 2.0.8:
+* Added string ConfigOption creation
+* Fixed elites derived from BaseElite being pushed into wrong elite tiers
+* Renamed BaseElite tier field to vanillaTier
+* Added BaseElite isHonor field
+	* Tier 1 elites are no longer auto-added to Honor tiers, and use this new field for that instead
+* Added some more generic ChildLocator additions
+#### 2.0.7:
+* Marked the mod as client-side
 #### 2.0.6:
 * Fixed CopyChildren setting the children positions to wrong values
 * BaseItem deprecatedTier is now set immediately

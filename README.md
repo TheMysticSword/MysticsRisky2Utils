@@ -5,6 +5,7 @@ DO NOT use this library for creating your own mods.
 
 ---
 ### End-user changelog:
-* Internal changes
+* Added string option support
+* Fixed tier 2 elites from dependent mods appearing too early with certain other mods
   
 (Full changelog with all the technical details can be found [here](https://github.com/TheMysticSword/MysticsRisky2Utils/blob/main/CHANGELOG.md))
