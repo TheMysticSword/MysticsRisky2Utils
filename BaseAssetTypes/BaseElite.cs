@@ -15,7 +15,8 @@ namespace MysticsRisky2Utils.BaseAssetTypes
     {
         public EliteDef eliteDef;
         public Texture recolorRamp;
-        public int tier = 0;
+        public int vanillaTier = 0;
+        public bool isHonor = false;
         public GameObject modelEffect;
         public delegate void OnModelEffectSpawn(CharacterModel model, GameObject effect);
         public OnModelEffectSpawn onModelEffectSpawn;
@@ -72,7 +73,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                             c.Emit(OpCodes.Ldloc, arrayLocalVarPos);
                             c.EmitDelegate<System.Func<EliteDef[], EliteDef[]>>((array) =>
                             {
-                                foreach (BaseElite customElite in elites.FindAll(x => x.tier == 1))
+                                foreach (BaseElite customElite in elites.FindAll(x => x.isHonor))
                                 {
                                     HG.ArrayUtils.ArrayAppend(ref array, customElite.eliteDef);
                                 }
@@ -184,15 +185,18 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             orig();
             foreach (BaseElite customElite in elites)
             {
-                switch (customElite.tier)
+                switch (customElite.vanillaTier)
                 {
                     case 1:
-                        HG.ArrayUtils.ArrayAppend(ref CombatDirector.eliteTiers[1].eliteTypes, customElite.eliteDef);
-                        HG.ArrayUtils.ArrayAppend(ref CombatDirector.eliteTiers[2].eliteTypes, customElite.eliteDef);
+                        HG.ArrayUtils.ArrayAppend(ref R2API.EliteAPI.VanillaEliteTiers[1].eliteTypes, customElite.eliteDef);
                         break;
                     case 2:
-                        HG.ArrayUtils.ArrayAppend(ref CombatDirector.eliteTiers[3].eliteTypes, customElite.eliteDef);
+                        HG.ArrayUtils.ArrayAppend(ref R2API.EliteAPI.VanillaEliteTiers[3].eliteTypes, customElite.eliteDef);
                         break;
+                }
+                if (customElite.isHonor)
+                {
+                    HG.ArrayUtils.ArrayAppend(ref R2API.EliteAPI.VanillaEliteTiers[2].eliteTypes, customElite.eliteDef);
                 }
             }
         }
