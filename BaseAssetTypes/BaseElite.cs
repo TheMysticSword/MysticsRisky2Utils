@@ -14,7 +14,6 @@ namespace MysticsRisky2Utils.BaseAssetTypes
     public abstract class BaseElite : BaseLoadableAsset
     {
         public EliteDef eliteDef;
-        public Texture recolorRamp;
         public int vanillaTier = 0;
         public bool isHonor = false;
         public GameObject modelEffect;
@@ -24,23 +23,23 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         public Material particleMaterialOverride;
 
         public static List<BaseElite> elites = new List<BaseElite>();
+        public static Dictionary<EliteIndex, BaseElite> elitesByIndex = new Dictionary<EliteIndex, BaseElite>();
 
         public override void Load()
         {
             eliteDef = ScriptableObject.CreateInstance<EliteDef>();
             OnLoad();
             eliteDef.modifierToken = "ELITE_MODIFIER_" + eliteDef.name.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
-            eliteDef.shaderEliteRampIndex = 0;
             asset = eliteDef;
             elites.Add(this);
         }
 
         internal static void Init()
         {
-            On.RoR2.CharacterModel.Awake += CharacterModel_Awake;
-            IL.RoR2.CharacterModel.UpdateMaterials += CharacterModel_UpdateMaterials;
-            On.RoR2.CharacterModel.UpdateMaterials += CharacterModel_UpdateMaterials1;
-            On.RoR2.CharacterModel.InstanceUpdate += CharacterModel_InstanceUpdate;
+            On.RoR2.EliteCatalog.Init += EliteCatalog_Init;
+
+            On.RoR2.CharacterModel.UpdateLights += CharacterModel_UpdateLights;
+            On.RoR2.CharacterModel.OnDestroy += CharacterModel_OnDestroy;
 
             On.RoR2.CombatDirector.Init += CombatDirector_Init;
             MethodInfo scriptedCombatEncounterSpawnHandler = typeof(ScriptedCombatEncounter).GetMethod("<Spawn>g__HandleSpawn|21_0", MysticsRisky2UtilsPlugin.bindingFlagAll);
@@ -73,7 +72,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                             c.Emit(OpCodes.Ldloc, arrayLocalVarPos);
                             c.EmitDelegate<System.Func<EliteDef[], EliteDef[]>>((array) =>
                             {
-                                foreach (BaseElite customElite in elites.FindAll(x => x.isHonor))
+                                foreach (BaseElite customElite in elites.FindAll(x => x.isHonor && x.eliteDef.IsAvailable()))
                                 {
                                     HG.ArrayUtils.ArrayAppend(ref array, customElite.eliteDef);
                                 }
@@ -94,90 +93,64 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             }
         }
 
-        private static void CharacterModel_Awake(On.RoR2.CharacterModel.orig_Awake orig, CharacterModel self)
+        private static void EliteCatalog_Init(On.RoR2.EliteCatalog.orig_Init orig)
         {
-            orig(self);
-            self.gameObject.AddComponent<MysticsRisky2UtilsCustomEliteFields>();
-        }
-
-        private static readonly int EliteRampPropertyID = Shader.PropertyToID("_EliteRamp");
-        private static void CharacterModel_UpdateMaterials(ILContext il)
-        {
-            ILCursor c = new ILCursor(il);
-            c.GotoNext(
-                MoveType.After,
-                x => x.MatchLdarg(0),
-                x => x.MatchLdfld<CharacterModel>("propertyStorage"),
-                x => x.MatchLdsfld(typeof(CommonShaderProperties), "_EliteIndex")
-            );
-            c.GotoNext(
-                MoveType.After,
-                x => x.MatchCallOrCallvirt<MaterialPropertyBlock>("SetFloat")
-            );
-            c.Emit(OpCodes.Ldarg, 0);
-            c.EmitDelegate<System.Action<CharacterModel>>((characterModel) =>
+            orig();
+            foreach (var elite in elites)
             {
-                MysticsRisky2UtilsCustomEliteFields component = characterModel.GetComponent<MysticsRisky2UtilsCustomEliteFields>();
-                if (component)
-                {
-                    BaseElite customElite = elites.FirstOrDefault(x => x.eliteDef.eliteIndex == characterModel.myEliteIndex);
-                    if (customElite != null)
-                    {
-                        component.resetEliteRampWhenAffixLost = true;
-                        characterModel.propertyStorage.SetTexture(EliteRampPropertyID, customElite.recolorRamp);
-                    }
-                    else if (component.resetEliteRampWhenAffixLost)
-                    {
-                        component.affixLost = true;
-                        characterModel.propertyStorage.SetTexture(EliteRampPropertyID, Shader.GetGlobalTexture(EliteRampPropertyID));
-                    }
-                }
-            });
-        }
-
-        private static void CharacterModel_UpdateMaterials1(On.RoR2.CharacterModel.orig_UpdateMaterials orig, CharacterModel self)
-        {
-            orig(self);
-            MysticsRisky2UtilsCustomEliteFields component = self.GetComponent<MysticsRisky2UtilsCustomEliteFields>();
-            if (component)
-            {
-                if (component.affixLost)
-                {
-                    component.resetEliteRampWhenAffixLost = false;
-                    component.affixLost = false;
-                }
+                elitesByIndex[elite.eliteDef.eliteIndex] = elite;
             }
         }
 
-        private static void CharacterModel_InstanceUpdate(On.RoR2.CharacterModel.orig_InstanceUpdate orig, CharacterModel self)
+        private class ActiveModelEffectInfo
         {
-            orig(self);
-            MysticsRisky2UtilsCustomEliteFields component = self.GetComponent<MysticsRisky2UtilsCustomEliteFields>();
-            if (component)
+            public GameObject instance;
+            public BaseElite elite;
+        }
+        private static Dictionary<CharacterModel, ActiveModelEffectInfo> modelEffects = new Dictionary<CharacterModel, ActiveModelEffectInfo>();
+
+        private static void CharacterModel_UpdateLights(On.RoR2.CharacterModel.orig_UpdateLights orig, CharacterModel self)
+        {
+            BaseElite currentCustomElite = null;
+            ActiveModelEffectInfo modelEffect = null;
+
+            if (elitesByIndex.TryGetValue(self.myEliteIndex, out currentCustomElite))
             {
-                BaseElite currentCustomElite = elites.FirstOrDefault(x => x.eliteDef.eliteIndex == self.myEliteIndex);
-                if (currentCustomElite != null)
+                self.lightColorOverride = currentCustomElite.lightColorOverride;
+                self.particleMaterialOverride = currentCustomElite.particleMaterialOverride;
+            }
+
+            if (modelEffects.TryGetValue(self, out modelEffect))
+            {
+                if (currentCustomElite != modelEffect.elite)
                 {
-                    self.lightColorOverride = currentCustomElite.lightColorOverride;
-                    self.particleMaterialOverride = currentCustomElite.particleMaterialOverride;
-                }
-                foreach (BaseElite customElite in elites.Where(x => x.modelEffect))
-                {
-                    if ((self.myEliteIndex == customElite.eliteDef.eliteIndex) != component.modelEffect)
-                    {
-                        if (!component.modelEffect)
-                        {
-                            component.modelEffect = Object.Instantiate(customElite.modelEffect, self.transform);
-                            if (customElite.onModelEffectSpawn != null) customElite.onModelEffectSpawn(self, component.modelEffect);
-                        }
-                        else
-                        {
-                            Object.Destroy(component.modelEffect);
-                            component.modelEffect = null;
-                        }
-                    }
+                    Object.Destroy(modelEffect.instance);
+                    modelEffects.Remove(self);
+                    modelEffect = null;
                 }
             }
+
+            if (currentCustomElite != null && modelEffect == null)
+            {
+                var modelEffectInstance = Object.Instantiate(currentCustomElite.modelEffect, self.transform);
+                if (currentCustomElite.onModelEffectSpawn != null)
+                    currentCustomElite.onModelEffectSpawn(self, modelEffectInstance);
+
+                modelEffects[self] = new ActiveModelEffectInfo
+                {
+                    elite = currentCustomElite,
+                    instance = modelEffectInstance
+                };
+            }
+
+            orig(self);
+        }
+
+        private static void CharacterModel_OnDestroy(On.RoR2.CharacterModel.orig_OnDestroy orig, CharacterModel self)
+        {
+            orig(self);
+            if (modelEffects.ContainsKey(self))
+                modelEffects.Remove(self);
         }
 
         private static void CombatDirector_Init(On.RoR2.CombatDirector.orig_Init orig)
@@ -199,13 +172,6 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                     HG.ArrayUtils.ArrayAppend(ref R2API.EliteAPI.VanillaEliteTiers[2].eliteTypes, customElite.eliteDef);
                 }
             }
-        }
-
-        private class MysticsRisky2UtilsCustomEliteFields : MonoBehaviour
-        {
-            public bool resetEliteRampWhenAffixLost = false;
-            public bool affixLost = false;
-            public GameObject modelEffect;
         }
     }
 }
