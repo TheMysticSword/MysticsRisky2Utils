@@ -42,7 +42,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             spawnCard.eliteRules = SpawnCard.EliteRules.Default;
             spawnCard.noElites = false;
             spawnCard.forbiddenAsBoss = false;
-            characterSpawnCards.Add(spawnCard);
+            characterSpawnCards[masterName] = spawnCard;
         }
 
         public void AddDirectorCardTo(string sceneName, string categoryName, DirectorCard directorCard)
@@ -67,7 +67,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         }
 
         public static Dictionary<string, Dictionary<string, List<DirectorCard>>> sceneCategoryCards = new Dictionary<string, Dictionary<string, List<DirectorCard>>>();
-        public static List<CharacterSpawnCard> characterSpawnCards = new List<CharacterSpawnCard>();
+        public static Dictionary<string, CharacterSpawnCard> characterSpawnCards = new Dictionary<string, CharacterSpawnCard>();
 
         internal static void Init()
         {
