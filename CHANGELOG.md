@@ -1,3 +1,20 @@
+#### 2.0.9:
+* Changed HurtBoxSetUpInfo from struct to class
+* Changed characterSpawnCards from a List to a Dictionary
+* Added BaseBuff.refreshable
+* Added isSniperTarget to HurtBoxSetUpInfo
+* Added a static BaseItemLike.AddDisplayRule. All the instance-specific ones refer to it now
+* Added an overload for BaseItemLike.AddDisplayRule that takes the itemDisplayPrefab argument before childName
+* Added BaseCharacterBody.onSetupIDRS and BaseCharacterBody.AddItemDisplay
+* Added EliteDisplays
+* Removed debug warning message about a body not being found for BaseItemLike IDRS set-up
+* Removed unused BaseItemLike.itemDisplayRuleDict
+* Removed DebugTools
+* Removed BaseElite recolour ramp functionality in favour of using R2API.EliteAPI's implementation
+* Removed MysticsRisky2UtilsCustomEliteFields
+* Updated dependencies to use only some R2API modules
+* Optimized BaseElite modelEffect handling
+* Optimized CustomTempVFXManagement
 #### 2.0.8:
 * Added string ConfigOption creation
 * Fixed elites derived from BaseElite being pushed into wrong elite tiers
