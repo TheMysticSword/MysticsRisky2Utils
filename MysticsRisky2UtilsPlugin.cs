@@ -35,6 +35,7 @@ namespace MysticsRisky2Utils
         {
             logger = Logger;
 
+            BaseAssetTypes.BaseBuff.Init();
             BaseAssetTypes.BaseCharacterMaster.Init();
             BaseAssetTypes.BaseElite.Init();
             BaseAssetTypes.BaseEquipment.Init();
