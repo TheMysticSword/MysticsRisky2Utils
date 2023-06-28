@@ -1,6 +1,6 @@
 {
   "name": "MysticsRisky2Utils",
-  "version_number": "2.0.8",
+  "version_number": "2.0.9",
   "website_url": "https://github.com/TheMysticSword/MysticsRisky2Utils",
   "description": "Library for TheMysticSword's mods",
   "dependencies": [
