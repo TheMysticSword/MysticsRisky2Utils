@@ -145,11 +145,12 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             return newStateMachine;
         }
 
-        public struct HurtBoxSetUpInfo
+        public class HurtBoxSetUpInfo
         {
             public Transform transform;
             public bool isBullseye;
             public bool isMain;
+            public bool isSniperTarget;
         }
 
         public void SetUpHurtBoxGroup(HurtBoxSetUpInfo[] hurtBoxSetUpInfos)
@@ -167,6 +168,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                 HurtBox hurtBox = hurtBoxSetUpInfo.transform.gameObject.AddComponent<HurtBox>();
                 hurtBox.healthComponent = healthComponent;
                 hurtBox.isBullseye = hurtBoxSetUpInfo.isBullseye;
+                hurtBox.isSniperTarget = hurtBoxSetUpInfo.isSniperTarget;
                 hurtBox.damageModifier = HurtBox.DamageModifier.Normal;
                 hurtBox.hurtBoxGroup = hurtBoxGroup;
                 hurtBox.indexInGroup = indexInGroup;
