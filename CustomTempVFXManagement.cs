@@ -1,7 +1,6 @@
 ﻿using RoR2;
-using R2API.Utils;
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace MysticsRisky2Utils
 {
@@ -31,54 +30,56 @@ namespace MysticsRisky2Utils
             On.RoR2.CharacterBody.UpdateAllTemporaryVisualEffects += (orig, self) =>
             {
                 orig(self);
-                MysticsRisky2UtilsCharacterCustomTempVFXHolder component = self.GetComponent<MysticsRisky2UtilsCharacterCustomTempVFXHolder>();
-                foreach (VFXInfo vfxInfo in allVFX)
+                if (MysticsRisky2UtilsCharacterCustomTempVFXHolder.bodyToVFXHolder.TryGetValue(self, out var component))
                 {
-                    bool active = vfxInfo.condition(self);
-                    MysticsRisky2UtilsTempVFX tempVFX = component.dictionary[vfxInfo.prefab];
-                    if (active)
+                    foreach (var vfxInfo in allVFX)
                     {
-                        if (!tempVFX)
+                        var active = vfxInfo.condition(self);
+                        var tempVFX = component.dictionary[vfxInfo.prefab];
+                        if (active)
                         {
-                            GameObject gameObject = Object.Instantiate<GameObject>(vfxInfo.prefab, self.corePosition, Quaternion.identity);
-
-                            tempVFX = gameObject.GetComponent<MysticsRisky2UtilsTempVFX>();
-                            component.dictionary[vfxInfo.prefab] = tempVFX;
-                            tempVFX.parentTransform = self.coreTransform;
-                            tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Enter;
-                            tempVFX.healthComponent = self.healthComponent;
-                            tempVFX.radius = vfxInfo.radius(self);
-
-                            LocalCameraEffect localCameraEffect = gameObject.GetComponent<LocalCameraEffect>();
-                            if (localCameraEffect) localCameraEffect.targetCharacter = self.gameObject;
-
-                            if (!string.IsNullOrEmpty(vfxInfo.child))
+                            if (!tempVFX)
                             {
-                                ModelLocator modelLocator = self.modelLocator;
-                                if (modelLocator)
+                                var gameObject = Object.Instantiate(vfxInfo.prefab, self.corePosition, Quaternion.identity);
+
+                                tempVFX = gameObject.GetComponent<MysticsRisky2UtilsTempVFX>();
+                                component.dictionary[vfxInfo.prefab] = tempVFX;
+                                tempVFX.parentTransform = self.coreTransform;
+                                tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Enter;
+                                tempVFX.healthComponent = self.healthComponent;
+                                tempVFX.radius = vfxInfo.radius(self);
+
+                                var localCameraEffect = gameObject.GetComponent<LocalCameraEffect>();
+                                if (localCameraEffect) localCameraEffect.targetCharacter = self.gameObject;
+
+                                if (!string.IsNullOrEmpty(vfxInfo.child))
                                 {
-                                    Transform modelTransform = modelLocator.modelTransform;
-                                    if (modelTransform)
+                                    var modelLocator = self.modelLocator;
+                                    if (modelLocator)
                                     {
-                                        ChildLocator childLocator = modelTransform.GetComponent<ChildLocator>();
-                                        if (childLocator)
+                                        var modelTransform = modelLocator.modelTransform;
+                                        if (modelTransform)
                                         {
-                                            Transform transform = childLocator.FindChild(vfxInfo.child);
-                                            if (transform)
+                                            var childLocator = modelTransform.GetComponent<ChildLocator>();
+                                            if (childLocator)
                                             {
-                                                tempVFX.parentTransform = transform;
-                                                return;
+                                                var transform = childLocator.FindChild(vfxInfo.child);
+                                                if (transform)
+                                                {
+                                                    tempVFX.parentTransform = transform;
+                                                    return;
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
+                            else tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Enter;
                         }
-                        else tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Enter;
-                    }
-                    else
-                    {
-                        if (tempVFX) tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Exit;
+                        else
+                        {
+                            if (tempVFX) tempVFX.visualState = MysticsRisky2UtilsTempVFX.VisualState.Exit;
+                        }
                     }
                 }
             };
@@ -131,10 +132,10 @@ namespace MysticsRisky2Utils
             public void RebuildVisuals()
             {
                 bool enterState = visualState == VisualState.Enter;
-                foreach (GameObject obj in enterObjects) obj.SetActive(enterState);
-                foreach (MonoBehaviour behaviours in enterBehaviours) behaviours.enabled = enterState;
-                foreach (GameObject obj in exitObjects) obj.SetActive(!enterState);
-                foreach (MonoBehaviour behaviours in exitBehaviours) behaviours.enabled = !enterState;
+                foreach (var obj in enterObjects) obj.SetActive(enterState);
+                foreach (var behaviour in enterBehaviours) behaviour.enabled = enterState;
+                foreach (var obj in exitObjects) obj.SetActive(!enterState);
+                foreach (var behaviour in exitBehaviours) behaviour.enabled = !enterState;
             }
 
             public enum VisualState
@@ -146,12 +147,24 @@ namespace MysticsRisky2Utils
 
         public class MysticsRisky2UtilsCharacterCustomTempVFXHolder : MonoBehaviour
         {
+            public CharacterBody characterBody;
             public Dictionary<GameObject, MysticsRisky2UtilsTempVFX> dictionary = new Dictionary<GameObject, MysticsRisky2UtilsTempVFX>();
-
+            
             public void Awake()
             {
-                foreach (VFXInfo vfxInfo in allVFX) dictionary.Add(vfxInfo.prefab, default);
+                characterBody = GetComponent<CharacterBody>();
+                bodyToVFXHolder[characterBody] = this;
+
+                foreach (var vfxInfo in allVFX) dictionary.Add(vfxInfo.prefab, default);
             }
+
+            public void OnDestroy()
+            {
+                if (bodyToVFXHolder.ContainsKey(characterBody))
+                    bodyToVFXHolder.Remove(characterBody);
+            }
+
+            public static Dictionary<CharacterBody, MysticsRisky2UtilsCharacterCustomTempVFXHolder> bodyToVFXHolder = new Dictionary<CharacterBody, MysticsRisky2UtilsCharacterCustomTempVFXHolder>();
         }
     }
 }
