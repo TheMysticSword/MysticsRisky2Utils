@@ -31,7 +31,6 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         /// Dictionary of named item display prefabs. Can be used for storing and retrieving multiple displays.
         /// </summary>
         public Dictionary<string, GameObject> itemDisplayPrefabs = new Dictionary<string, GameObject>();
-        public ItemDisplayRuleDict itemDisplayRuleDict = new ItemDisplayRuleDict();
         public static event System.Action onSetupIDRS;
         
         public GameObject PrepareModel(GameObject model)
@@ -90,49 +89,38 @@ namespace MysticsRisky2Utils.BaseAssetTypes
             return itemDisplayModel;
         }
 
-        public struct MysticsRisky2UtilsItemDisplayRules
-        {
-            public BaseItemLike baseItem;
-            public List<ItemDisplayRule> displayRules;
-        }
-
-        public static Dictionary<string, List<MysticsRisky2UtilsItemDisplayRules>> perBodyDisplayRules = new Dictionary<string, List<MysticsRisky2UtilsItemDisplayRules>>();
+        public static Dictionary<string, Dictionary<object, List<ItemDisplayRule>>> perBodyDisplayRules = new Dictionary<string, Dictionary<object, List<ItemDisplayRule>>>();
         
         public virtual void AddDisplayRule(string bodyName, string childName, Vector3 localPos, Vector3 localAngles, Vector3 localScale)
         {
-            AddDisplayRule(bodyName, childName, itemDisplayPrefab, localPos, localAngles, localScale);
+            AddDisplayRule(bodyName, itemDisplayPrefab, childName, localPos, localAngles, localScale);
         }
 
         public virtual void AddDisplayRule(string bodyName, string childName, GameObject itemDisplayPrefab, Vector3 localPos, Vector3 localAngles, Vector3 localScale)
         {
-            perBodyDisplayRules.TryGetValue(bodyName, out List<MysticsRisky2UtilsItemDisplayRules> displayRulesList);
-            if (displayRulesList == null)
+            AddDisplayRule(bodyName, itemDisplayPrefab, childName, localPos, localAngles, localScale);
+        }
+
+        public virtual void AddDisplayRule(string bodyName, GameObject itemDisplayPrefab, string childName, Vector3 localPos, Vector3 localAngles, Vector3 localScale)
+        {
+            AddDisplayRule(bodyName, asset, itemDisplayPrefab, childName, localPos, localAngles, localScale);
+        }
+
+        public static void AddDisplayRule(string bodyName, object keyAsset, GameObject itemDisplayPrefab, string childName, Vector3 localPos, Vector3 localAngles, Vector3 localScale)
+        {
+            Dictionary<object, List<ItemDisplayRule>> perItemDisplayRules;
+            if (!perBodyDisplayRules.TryGetValue(bodyName, out perItemDisplayRules))
             {
-                displayRulesList = new List<MysticsRisky2UtilsItemDisplayRules>()
-                {
-                    new MysticsRisky2UtilsItemDisplayRules
-                    {
-                        baseItem = this,
-                        displayRules = new List<ItemDisplayRule>()
-                    }
-                };
-                perBodyDisplayRules.Add(bodyName, displayRulesList);
+                perItemDisplayRules = new Dictionary<object, List<ItemDisplayRule>>();
+                perBodyDisplayRules[bodyName] = perItemDisplayRules;
             }
-            MysticsRisky2UtilsItemDisplayRules displayRulesForThisItem = default;
-            if (displayRulesList.Any(x => x.baseItem == this))
+            List<ItemDisplayRule> displayRulesForThisItem;
+            if (!perItemDisplayRules.TryGetValue(keyAsset, out displayRulesForThisItem))
             {
-                displayRulesForThisItem = displayRulesList.Find(x => x.baseItem == this);
+                displayRulesForThisItem = new List<ItemDisplayRule>();
+                perItemDisplayRules[keyAsset] = displayRulesForThisItem;
             }
-            else
-            {
-                displayRulesForThisItem = new MysticsRisky2UtilsItemDisplayRules
-                {
-                    baseItem = this,
-                    displayRules = new List<ItemDisplayRule>()
-                };
-                displayRulesList.Add(displayRulesForThisItem);
-            }
-            displayRulesForThisItem.displayRules.Add(new ItemDisplayRule
+            displayRulesForThisItem.Add(new ItemDisplayRule
             {
                 ruleType = ItemDisplayRuleType.ParentedPrefab,
                 followerPrefab = itemDisplayPrefab,
@@ -145,33 +133,33 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 
         public abstract UnlockableDef GetUnlockableDef();
 
-        public static void PostGameLoad()
+        internal static void PostGameLoad()
         {
             if (onSetupIDRS != null) onSetupIDRS();
-            foreach (KeyValuePair<string, List<MysticsRisky2UtilsItemDisplayRules>> displayRulesList in perBodyDisplayRules)
+            if (BaseCharacterBody.onSetupIDRS != null) BaseCharacterBody.onSetupIDRS();
+            var changedIDRS = new List<ItemDisplayRuleSet>();
+            foreach (var kvp in perBodyDisplayRules)
             {
-                string bodyName = displayRulesList.Key;
-                BodyIndex bodyIndex = BodyCatalog.FindBodyIndex(bodyName);
+                var bodyName = kvp.Key;
+                var bodyIndex = BodyCatalog.FindBodyIndex(bodyName);
                 if (bodyIndex != BodyIndex.None)
                 {
-                    
-                    GameObject bodyPrefab = BodyCatalog.GetBodyPrefab(bodyIndex);
-                    CharacterModel characterModel = bodyPrefab.GetComponentInChildren<CharacterModel>();
-                    ItemDisplayRuleSet idrs = characterModel.itemDisplayRuleSet;
-
-                    foreach (MysticsRisky2UtilsItemDisplayRules displayRules in displayRulesList.Value)
+                    var bodyPrefab = BodyCatalog.GetBodyPrefab(bodyIndex);
+                    var characterModel = bodyPrefab.GetComponentInChildren<CharacterModel>();
+                    var idrs = characterModel.itemDisplayRuleSet;
+                    if (idrs)
                     {
-                        BaseItemLike item = displayRules.baseItem;
-                        Object keyAsset = (Object)item.asset;
-                        idrs.SetDisplayRuleGroup(keyAsset, new DisplayRuleGroup { rules = displayRules.displayRules.ToArray() });
+                        foreach (var displayRules in kvp.Value)
+                        {
+                            idrs.SetDisplayRuleGroup((Object)displayRules.Key, new DisplayRuleGroup { rules = displayRules.Value.ToArray() });
+                        }
+                        if (!changedIDRS.Contains(idrs))
+                            changedIDRS.Add(idrs);
                     }
-                    idrs.InvokeMethod("GenerateRuntimeValues");
-                }
-                else
-                {
-                    MysticsRisky2UtilsPlugin.logger.LogWarning("Body \"" + bodyName + "\" not found for setting up item display rule sets");
                 }
             }
+            foreach (var idrs in changedIDRS)
+                idrs.GenerateRuntimeValues();
         }
 
         public abstract PickupIndex GetPickupIndex();

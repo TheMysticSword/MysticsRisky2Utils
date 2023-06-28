@@ -234,5 +234,12 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                 return _ccpStandard;
             }
         }
+
+        public static System.Action onSetupIDRS;
+
+        public void AddDisplayRule(object keyAsset, GameObject itemDisplayPrefab, string childName, Vector3 localPos, Vector3 localAngles, Vector3 localScale)
+        {
+            BaseItemLike.AddDisplayRule(bodyName + "Body", keyAsset, itemDisplayPrefab, childName, localPos, localAngles, localScale);
+        }
     }
 }
