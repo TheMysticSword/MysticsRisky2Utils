@@ -130,7 +130,7 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                 }
             }
 
-            if (currentCustomElite != null && modelEffect == null)
+            if (currentCustomElite != null && modelEffect == null && currentCustomElite.modelEffect != null)
             {
                 var modelEffectInstance = Object.Instantiate(currentCustomElite.modelEffect, self.transform);
                 if (currentCustomElite.onModelEffectSpawn != null)

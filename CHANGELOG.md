@@ -1,3 +1,5 @@
+#### 2.0.10:
+* Fixed BaseElite throwing NREs every frame if a BaseElite doesn't have a model effect assigned to it
 #### 2.0.9:
 * Changed HurtBoxSetUpInfo from struct to class
 * Changed characterSpawnCards from a List to a Dictionary
