@@ -1,3 +1,7 @@
+#### 2.0.12:
+* Fixed BaseItemLike item displays being overwritten by newest ones if two bodies share the same ItemDisplayRuleSet
+#### 2.0.11:
+* Fixed DirectorCards added by BaseCharacterMaster.AddDirectorCard not actually being added to in-game monster pools
 #### 2.0.10:
 * Fixed BaseElite throwing NREs every frame if a BaseElite doesn't have a model effect assigned to it
 #### 2.0.9:
