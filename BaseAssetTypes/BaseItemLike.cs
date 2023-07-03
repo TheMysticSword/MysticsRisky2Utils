@@ -147,14 +147,13 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                     var bodyPrefab = BodyCatalog.GetBodyPrefab(bodyIndex);
                     var characterModel = bodyPrefab.GetComponentInChildren<CharacterModel>();
                     var idrs = characterModel.itemDisplayRuleSet;
-                    if (idrs)
+                    if (idrs && !changedIDRS.Contains(idrs))
                     {
                         foreach (var displayRules in kvp.Value)
                         {
                             idrs.SetDisplayRuleGroup((Object)displayRules.Key, new DisplayRuleGroup { rules = displayRules.Value.ToArray() });
                         }
-                        if (!changedIDRS.Contains(idrs))
-                            changedIDRS.Add(idrs);
+                        changedIDRS.Add(idrs);
                     }
                 }
             }
