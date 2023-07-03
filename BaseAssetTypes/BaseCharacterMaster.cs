@@ -1,3 +1,5 @@
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using MysticsRisky2Utils.ContentManagement;
 using RoR2;
 using RoR2.Navigation;
@@ -71,30 +73,41 @@ namespace MysticsRisky2Utils.BaseAssetTypes
 
         internal static void Init()
         {
-            On.RoR2.ClassicStageInfo.Awake += ClassicStageInfo_Awake;
+            IL.RoR2.ClassicStageInfo.RebuildCards += ClassicStageInfo_RebuildCards;
         }
 
-        private static void ClassicStageInfo_Awake(On.RoR2.ClassicStageInfo.orig_Awake orig, ClassicStageInfo self)
+        private static void ClassicStageInfo_RebuildCards(ILContext il)
         {
-            orig(self);
-            if (self.monsterCategories)
+            ILCursor c = new ILCursor(il);
+
+            int dccsVarIndex = -1;
+            if (c.TryGotoNext(
+                MoveType.After,
+                x => x.MatchLdnull(),
+                x => x.MatchStloc(out dccsVarIndex)
+            ) && c.TryGotoNext(
+                MoveType.After,
+                x => x.MatchRet()
+            ))
             {
-                SceneInfo sceneInfo = self.GetComponent<SceneInfo>();
-                SceneDef sceneDef = sceneInfo.sceneDef;
-                if (sceneDef)
+                c.MoveAfterLabels();
+                c.Emit(OpCodes.Ldarg, 0);
+                c.Emit(OpCodes.Ldloc, dccsVarIndex);
+                c.EmitDelegate<System.Action<ClassicStageInfo, DirectorCardCategorySelection>>((classicStageInfo, dccs) =>
                 {
-                    if (sceneCategoryCards.ContainsKey(sceneDef.baseSceneName))
+                    var sceneInfo = classicStageInfo.GetComponent<SceneInfo>();
+                    var sceneDef = sceneInfo.sceneDef;
+                    if (sceneDef)
                     {
-                        Dictionary<string, List<DirectorCard>> categoryCards = sceneCategoryCards[sceneDef.baseSceneName];
-                        DirectorCardCategorySelection dccs = self.monsterCategories;
-                        if (dccs != null)
+                        if (sceneCategoryCards.ContainsKey(sceneDef.baseSceneName))
                         {
-                            for (int i = 0; i < dccs.categories.Length; i++)
+                            var categoryCards = sceneCategoryCards[sceneDef.baseSceneName];
+                            for (var i = 0; i < dccs.categories.Length; i++)
                             {
-                                DirectorCardCategorySelection.Category category = dccs.categories[i];
+                                var category = dccs.categories[i];
                                 if (categoryCards.ContainsKey(category.name))
                                 {
-                                    foreach (DirectorCard directorCard in categoryCards[category.name])
+                                    foreach (var directorCard in categoryCards[category.name])
                                     {
                                         dccs.AddCard(i, directorCard);
                                     }
@@ -102,7 +115,11 @@ namespace MysticsRisky2Utils.BaseAssetTypes
                             }
                         }
                     }
-                }
+                });
+            }
+            else
+            {
+                MysticsRisky2UtilsPlugin.logger.LogError("Failed to hook ClassicStageInfo.RebuildCards. Custom enemies will not spawn naturally!");
             }
         }
     }
