@@ -16,6 +16,7 @@ namespace MysticsRisky2Utils
         public delegate void DamageAttackerVictimEventHandler(DamageInfo damageInfo, GenericCharacterInfo attackerInfo, GenericCharacterInfo victimInfo);
         public delegate void DamageAttackerEventHandler(DamageInfo damageInfo, GenericCharacterInfo attackerInfo);
         public delegate void DamageModifierEventHandler(DamageInfo damageInfo, GenericCharacterInfo attackerInfo, GenericCharacterInfo victimInfo, ref float damage);
+        public delegate void DamageExecutionEventHandler(DamageInfo damageInfo, GenericCharacterInfo attackerInfo, GenericCharacterInfo victimInfo, float damage, ref float executionThreshold, ref GameObject executionEffectPrefab, ref bool forceExecution);
         public delegate void DamageVictimEventHandler(DamageInfo damageInfo, GenericCharacterInfo victimInfo);
         public delegate void DamageReportEventHandler(DamageReport damageReport);
         public delegate void SceneRNGEventHandler(Xoroshiro128Plus rng);
@@ -28,6 +29,7 @@ namespace MysticsRisky2Utils
         public static event DamageModifierEventHandler OnApplyDamageIncreaseModifiers;
         public static event DamageModifierEventHandler OnApplyDamageReductionModifiers;
         public static event DamageModifierEventHandler OnApplyDamageCapModifiers;
+        public static event DamageExecutionEventHandler OnApplyDamageExecutions;
         public static event DamageReportEventHandler OnTakeDamage;
         public static event SceneRNGEventHandler OnPopulateScene;
         public static event InteractionEventHandler OnInteractionBegin;
@@ -74,6 +76,9 @@ namespace MysticsRisky2Utils
                 ILCursor c = new ILCursor(il);
                 int bypassArmorFlagPosition = 5;
                 int damagePosition = 6;
+                int executionThresholdPosition = 53;
+                int executionEffectPosition = 10;
+                int forceExecutionPosition = 8;
                 if (c.TryGotoNext(
                     MoveType.AfterLabel,
                     x => x.MatchLdarg(1),
@@ -162,6 +167,59 @@ namespace MysticsRisky2Utils
                         c.Emit(OpCodes.Stloc, damagePosition);
                     }
                     else ErrorHookFailed("on apply damage cap modifiers");
+                    if (c.TryGotoNext(
+                        MoveType.After,
+                        x => x.MatchLdfld<CharacterBody>("bodyFlags"),
+                        x => x.MatchLdcI4((int)CharacterBody.BodyFlags.ImmuneToExecutes)
+                    ) && c.TryGotoPrev(
+                        MoveType.After,
+                        x => x.MatchLdfld<CharacterBody>("bodyFlags"),
+                        x => x.MatchLdcI4((int)CharacterBody.BodyFlags.ImmuneToVoidDeath)
+                    ) && c.TryGotoNext(
+                        MoveType.After,
+                        x => x.MatchStloc(out forceExecutionPosition)
+                    ) && c.TryGotoNext(
+                        MoveType.After,
+                        x => x.MatchLdcR4(float.NegativeInfinity),
+                        x => x.MatchStloc(out executionThresholdPosition)
+                    ) && c.TryGotoNext(
+                        MoveType.After,
+                        x => x.MatchLdsfld<EntityStates.FrozenState>("executeEffectPrefab"),
+                        x => x.MatchStloc(out executionEffectPosition)
+                    ) && c.TryGotoPrev(
+                        MoveType.After,
+                        x => x.MatchCallOrCallvirt<HealthComponent>("get_isInFrozenState")
+                    ) && c.TryGotoPrev(
+                        MoveType.Before,
+                        x => x.MatchLdarg(0)
+                    ))
+                    {
+                        c.MoveAfterLabels();
+                        c.Emit(OpCodes.Ldarg_0);
+                        c.Emit(OpCodes.Ldarg_1);
+                        c.Emit(OpCodes.Ldloc_1);
+                        c.Emit(OpCodes.Ldloc, damagePosition);
+                        c.Emit(OpCodes.Ldloc, executionThresholdPosition);
+                        c.Emit(OpCodes.Ldloc, executionEffectPosition);
+                        c.Emit(OpCodes.Ldloc, forceExecutionPosition);
+                        float newExecutionThreshold = 0f;
+                        GameObject newExecutionEffectPrefab = null;
+                        bool newForceExecution = false;
+                        c.EmitDelegate<System.Action<HealthComponent, DamageInfo, CharacterBody, float, float, GameObject, bool>>((healthComponent, damageInfo, attackerBody, damage, executionThreshold, executionEffectPrefab, forceExecution) =>
+                        {
+                            CharacterBody victimBody = healthComponent.body;
+                            GenericCharacterInfo attackerInfo = new GenericCharacterInfo(attackerBody);
+                            GenericCharacterInfo victimInfo = new GenericCharacterInfo(victimBody);
+                            if (OnApplyDamageExecutions != null) OnApplyDamageExecutions(damageInfo, attackerInfo, victimInfo, damage, ref executionThreshold, ref executionEffectPrefab, ref forceExecution);
+                        });
+                        c.EmitDelegate<System.Func<float>>(() => newExecutionThreshold);
+                        c.Emit(OpCodes.Stloc, executionThresholdPosition);
+                        c.EmitDelegate<System.Func<GameObject>>(() => newExecutionEffectPrefab);
+                        c.Emit(OpCodes.Stloc, executionEffectPosition);
+                        c.EmitDelegate<System.Func<bool>>(() => newForceExecution);
+                        c.Emit(OpCodes.Stloc, forceExecutionPosition);
+                    }
+                    else ErrorHookFailed("on apply damage executions");
                 }
                 else ErrorHookFailed("get HealthComponent local variable positions");
             };
