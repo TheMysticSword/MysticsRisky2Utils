@@ -1,3 +1,6 @@
+#### 2.0.13:
+* Added GenericGameEvents.OnApplyDamageExecutions
+* Fixed DirectorCards added by BaseCharacterMaster.AddDirectorCard appearing in family event spawn selections
 #### 2.0.12:
 * Fixed BaseItemLike item displays being overwritten by newest ones if two bodies share the same ItemDisplayRuleSet
 #### 2.0.11:
