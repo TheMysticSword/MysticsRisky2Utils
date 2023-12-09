@@ -80,36 +80,33 @@ namespace MysticsRisky2Utils.BaseAssetTypes
         {
             ILCursor c = new ILCursor(il);
 
-            int dccsVarIndex = -1;
             if (c.TryGotoNext(
                 MoveType.After,
-                x => x.MatchLdnull(),
-                x => x.MatchStloc(out dccsVarIndex)
-            ) && c.TryGotoNext(
-                MoveType.After,
-                x => x.MatchRet()
+                x => x.MatchStfld<ClassicStageInfo>("modifiableMonsterCategories")
             ))
             {
-                c.MoveAfterLabels();
                 c.Emit(OpCodes.Ldarg, 0);
-                c.Emit(OpCodes.Ldloc, dccsVarIndex);
-                c.EmitDelegate<System.Action<ClassicStageInfo, DirectorCardCategorySelection>>((classicStageInfo, dccs) =>
+                c.EmitDelegate<System.Action<ClassicStageInfo>>((classicStageInfo) =>
                 {
-                    var sceneInfo = classicStageInfo.GetComponent<SceneInfo>();
-                    var sceneDef = sceneInfo.sceneDef;
-                    if (sceneDef)
+                    var dccs = classicStageInfo.modifiableMonsterCategories;
+                    if (!(dccs is FamilyDirectorCardCategorySelection))
                     {
-                        if (sceneCategoryCards.ContainsKey(sceneDef.baseSceneName))
+                        var sceneInfo = classicStageInfo.GetComponent<SceneInfo>();
+                        var sceneDef = sceneInfo.sceneDef;
+                        if (sceneDef)
                         {
-                            var categoryCards = sceneCategoryCards[sceneDef.baseSceneName];
-                            for (var i = 0; i < dccs.categories.Length; i++)
+                            if (sceneCategoryCards.ContainsKey(sceneDef.baseSceneName))
                             {
-                                var category = dccs.categories[i];
-                                if (categoryCards.ContainsKey(category.name))
+                                var categoryCards = sceneCategoryCards[sceneDef.baseSceneName];
+                                for (var i = 0; i < dccs.categories.Length; i++)
                                 {
-                                    foreach (var directorCard in categoryCards[category.name])
+                                    var category = dccs.categories[i];
+                                    if (categoryCards.ContainsKey(category.name))
                                     {
-                                        dccs.AddCard(i, directorCard);
+                                        foreach (var directorCard in categoryCards[category.name])
+                                        {
+                                            dccs.AddCard(i, directorCard);
+                                        }
                                     }
                                 }
                             }
