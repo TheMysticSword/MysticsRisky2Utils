@@ -42,7 +42,6 @@ namespace MysticsRisky2Utils
             BaseAssetTypes.BaseInteractable.Init();
             CharacterModelMaterialOverrides.Init();
             ChildLocatorAdditions.Init();
-            ConCommandHelper.Init();
             ConfigOptions.Init();
             CostTypeCreation.Init();
             CustomTempVFXManagement.Init();
