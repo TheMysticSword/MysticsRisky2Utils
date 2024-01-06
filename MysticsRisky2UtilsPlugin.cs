@@ -26,7 +26,7 @@ namespace MysticsRisky2Utils
     {
         public const string PluginGUID = "com.themysticsword.mysticsrisky2utils";
         public const string PluginName = "MysticsRisky2Utils";
-        public const string PluginVersion = "2.0.13";
+        public const string PluginVersion = "2.0.14";
 
         internal static BepInEx.Logging.ManualLogSource logger;
         internal const BindingFlags bindingFlagAll = (BindingFlags)(-1);
