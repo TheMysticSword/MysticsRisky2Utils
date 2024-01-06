@@ -120,10 +120,10 @@ namespace MysticsRisky2Utils
                 {
                     bepinexConfigEntry.SettingChanged += (x, y) =>
                     {
-                        onChanged(bepinexConfigEntry.Value);
+                        onChanged(Value);
                         reloadLogbook = true;
                     };
-                    onChanged(bepinexConfigEntry.Value);
+                    onChanged(Value);
                     reloadLogbook = true;
                 }
             }
