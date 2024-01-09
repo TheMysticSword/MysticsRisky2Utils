@@ -207,6 +207,10 @@ namespace MysticsRisky2Utils
                         bool newForceExecution = false;
                         c.EmitDelegate<System.Action<HealthComponent, DamageInfo, CharacterBody, float, float, GameObject, bool>>((healthComponent, damageInfo, attackerBody, damage, executionThreshold, executionEffectPrefab, forceExecution) =>
                         {
+                            newExecutionThreshold = executionThreshold;
+                            newExecutionEffectPrefab = executionEffectPrefab;
+                            newForceExecution = forceExecution;
+
                             CharacterBody victimBody = healthComponent.body;
                             GenericCharacterInfo attackerInfo = new GenericCharacterInfo(attackerBody);
                             GenericCharacterInfo victimInfo = new GenericCharacterInfo(victimBody);
